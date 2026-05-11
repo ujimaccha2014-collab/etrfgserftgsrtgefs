@@ -577,6 +577,53 @@
     <button onclick="resetRace()" style="background:none;border:none;color:#999;cursor:pointer;">はじめからやり直す</button>
   </div>
 
+  <!-- レース終了後「もう一回」ボタン -->
+  <div id="retry-controls" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:10px;">
+    <button class="start-btn" style="background:#81c784; box-shadow:0 4px 0 #388e3c;" onclick="openPreRaceModal()">🔄 もう一回！</button>
+    <button onclick="resetRace()" style="background:none;border:none;color:#999;cursor:pointer;">はじめからやり直す</button>
+  </div>
+
+  <!-- ===== 賭け→スタート モーダル ===== -->
+  <div class="modal-overlay" id="prerace-modal">
+    <div class="modal-box" style="width:380px;">
+      <div class="modal-title">
+        <span>🎰 次のレースに賭ける</span>
+        <button class="close-btn" onclick="closeModal('prerace-modal')">✕</button>
+      </div>
+      <div style="font-size:13px;color:#888;margin-bottom:12px;">賭けてからスタート！賭けなくてもOK。</div>
+
+      <div style="margin-bottom:10px;">
+        <label style="font-size:13px;font-weight:bold;color:#555;">どのロボットに？</label>
+        <select id="prerace-bet-select" style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;"></select>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:13px;font-weight:bold;color:#555;">賭け金（円）</label>
+        <input id="prerace-bet-amount" type="number" min="1" value="100" oninput="updatePreRaceOdds()"
+          style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;" />
+      </div>
+      <div style="background:#f9f9f9;border-radius:12px;padding:10px;margin-bottom:14px;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:#888;">オッズ</span>
+          <span id="prerace-odds" style="font-weight:bold;color:#ef6c00;">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:#888;">残高</span>
+          <span id="prerace-balance" style="font-weight:bold;">- 円</span>
+        </div>
+      </div>
+      <div id="prerace-msg" style="min-height:1.2em;font-size:12px;color:#e57373;margin-bottom:10px;"></div>
+
+      <div style="display:flex;gap:8px;">
+        <button onclick="startWithBet(true)" style="flex:2;padding:12px;background:#ffb74d;color:white;border:none;border-radius:14px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 3px 0 #f57c00;">
+          🎯 賭けてスタート！
+        </button>
+        <button onclick="startWithBet(false)" style="flex:1;padding:12px;background:#e0e0e0;color:#555;border:none;border-radius:14px;font-size:14px;font-weight:bold;cursor:pointer;">
+          賭けずにスタート
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== PROFILE MODAL ===== -->
   <div class="modal-overlay" id="profile-modal">
     <div class="modal-box">
@@ -662,6 +709,46 @@
     </div>
   </div>
 
+  <!-- ===== OTHER PLAYER PROFILE MODAL ===== -->
+  <div class="modal-overlay" id="other-profile-modal">
+    <div class="modal-box" style="width:360px;">
+      <div class="modal-title">
+        <span>👤 プレイヤー情報</span>
+        <button class="close-btn" onclick="closeModal('other-profile-modal')">✕</button>
+      </div>
+      <div class="profile-avatar" id="op-avatar">🤖</div>
+      <div style="text-align:center; margin-bottom:16px;">
+        <div id="op-name" style="font-size:22px;font-weight:bold;color:#333;">---</div>
+        <div id="op-spirit" style="font-size:13px;color:#888;margin-top:5px;min-height:1.4em;">---</div>
+        <div id="op-you-badge" style="display:none;margin-top:6px;">
+          <span style="background:#fff9c4;border:1px solid #ffd54f;color:#f57c00;border-radius:20px;padding:3px 12px;font-size:12px;font-weight:bold;">あなた</span>
+        </div>
+      </div>
+      <div style="background:#f9f9f9;border-radius:14px;padding:14px;">
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">💰 残高</span>
+          <span class="profile-stat-value" id="op-balance">-</span>
+        </div>
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">🎰 総賭け回数</span>
+          <span class="profile-stat-value" id="op-total">-</span>
+        </div>
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">✅ 的中回数</span>
+          <span class="profile-stat-value" id="op-wins">-</span>
+        </div>
+        <div class="profile-stat-row" style="border-bottom:none;">
+          <span class="profile-stat-label">📊 勝率</span>
+          <span class="profile-stat-value" id="op-rate">-</span>
+        </div>
+      </div>
+      <!-- 自分のプロフィールを開くボタン（自分の行クリック時のみ表示） -->
+      <div id="op-edit-btn-wrap" style="display:none;margin-top:12px;">
+        <button onclick="closeModal('other-profile-modal'); openProfile();" style="width:100%;padding:10px;background:#81d4fa;color:white;border:none;border-radius:12px;font-size:14px;font-weight:bold;cursor:pointer;">✏️ 自分のプロフィールを編集する</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST -->
   <div id="toast"></div>
   <div id="firebase-status">Firebase: 初期化中...</div>
@@ -697,12 +784,13 @@
     }
 
     // Firebaseへのランキング保存
-    window._fbSaveRanking = async function(userId, name, balance, totalBets, wins) {
+    window._fbSaveRanking = async function(userId, name, balance, totalBets, wins, spirit) {
       if (!firebaseOK || !db) return;
       try {
         const winRate = totalBets > 0 ? Math.round((wins / totalBets) * 1000) / 10 : 0;
         await set(ref(db, 'ranking/' + userId), {
-          name: name || 'ゲスト',
+          name: name || 'プレイヤー',
+          spirit: spirit || '',
           balance: balance,
           totalBets: totalBets,
           wins: wins,
@@ -766,7 +854,7 @@
 
     function syncToFirebase() {
       if (typeof window._fbSaveRanking === 'function') {
-        window._fbSaveRanking(userId, profile.name, playerBalance, stats.totalBets, stats.wins);
+        window._fbSaveRanking(userId, profile.name, playerBalance, stats.totalBets, stats.wins, profile.spirit);
       }
     }
 
@@ -877,31 +965,56 @@
       if (currentRankTab === 'balance') {
         list.sort((a, b) => b.balance - a.balance);
         document.getElementById('ranking-list').innerHTML = list.slice(0, 20).map((u, i) => `
-          <div class="ranking-row" style="${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
+          <div class="ranking-row" onclick="openOtherProfile('${u.id}')" style="cursor:pointer;${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
             <span class="ranking-medal">${medals[i] || (i+1) + '.'}</span>
-            <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#aaa">(あなた)</small>' : ''}</span>
+            <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#f57c00">（あなた）</small>' : ''}</span>
             <div style="text-align:right;">
               <div class="ranking-value">${(u.balance||0).toLocaleString()} 円</div>
               <div class="ranking-sub">${u.totalBets||0}回中${u.wins||0}回</div>
             </div>
+            <span style="color:#ccc;font-size:16px;margin-left:4px;">›</span>
           </div>`).join('');
       } else {
-        list.filter(u => (u.totalBets || 0) >= 3).sort((a, b) => b.winRate - a.winRate);
-        const filtered = list.filter(u => (u.totalBets || 0) >= 3);
+        const filtered = list.filter(u => (u.totalBets || 0) >= 3).sort((a, b) => b.winRate - a.winRate);
         if (filtered.length === 0) {
           document.getElementById('ranking-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;font-size:13px;">3回以上賭けたプレイヤーがいません</div>';
           return;
         }
         document.getElementById('ranking-list').innerHTML = filtered.slice(0, 20).map((u, i) => `
-          <div class="ranking-row" style="${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
+          <div class="ranking-row" onclick="openOtherProfile('${u.id}')" style="cursor:pointer;${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
             <span class="ranking-medal">${medals[i] || (i+1) + '.'}</span>
-            <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#aaa">(あなた)</small>' : ''}</span>
+            <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#f57c00">（あなた）</small>' : ''}</span>
             <div style="text-align:right;">
               <div class="ranking-value">${u.winRate||0}%</div>
               <div class="ranking-sub">${u.totalBets||0}戦 / ${u.wins||0}勝</div>
             </div>
+            <span style="color:#ccc;font-size:16px;margin-left:4px;">›</span>
           </div>`).join('');
       }
+    }
+
+    function openOtherProfile(id) {
+      const u = rankingData[id];
+      if (!u) return;
+      const isMe = id === userId;
+      const winRate = (u.totalBets || 0) > 0 ? ((u.wins || 0) / u.totalBets * 100).toFixed(1) : '0.0';
+
+      // アバター色（名前からハッシュ）
+      let hash = 0;
+      for (let c of String(u.name)) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffffff;
+      const hue = Math.abs(hash) % 360;
+      document.getElementById('op-avatar').style.background = `linear-gradient(135deg, hsl(${hue},60%,70%), hsl(${(hue+80)%360},55%,65%))`;
+
+      document.getElementById('op-name').innerText = escHtml(u.name);
+      document.getElementById('op-spirit').innerText = u.spirit || '（意気込み未設定）';
+      document.getElementById('op-balance').innerText = (u.balance || 0).toLocaleString() + ' 円';
+      document.getElementById('op-total').innerText = (u.totalBets || 0) + ' 回';
+      document.getElementById('op-wins').innerText = (u.wins || 0) + ' 回';
+      document.getElementById('op-rate').innerText = winRate + '%';
+      document.getElementById('op-you-badge').style.display = isMe ? 'block' : 'none';
+      document.getElementById('op-edit-btn-wrap').style.display = isMe ? 'block' : 'none';
+
+      document.getElementById('other-profile-modal').classList.add('open');
     }
 
     function escHtml(s) {
@@ -1254,6 +1367,7 @@
       unlockBetting();
       currentBet = null;
       document.getElementById('bet-msg').innerText = '';
+      document.getElementById('retry-controls').style.display = 'none';
       initRace();
     }
 
@@ -1263,8 +1377,67 @@
         clearInterval(timer);
         timer = null;
         checkPayoutsOnFinish();
-        setTimeout(unlockBetting, 1000);
+        setTimeout(() => {
+          unlockBetting();
+          // 「もう一回」ボタンを表示
+          document.getElementById('retry-controls').style.display = 'flex';
+        }, 1000);
       }
+    }
+
+    // ===================================================
+    // PRE-RACE BET MODAL
+    // ===================================================
+    function openPreRaceModal() {
+      // まずロボットをリセット（賭け選択のため）
+      if (timer) clearInterval(timer);
+      timer = null;
+      currentBet = null;
+      document.getElementById('retry-controls').style.display = 'none';
+
+      // ロボットを初期化（表示のみ、モーダルを先に開く）
+      initRace();
+
+      // セレクトを埋める
+      const sel = document.getElementById('prerace-bet-select');
+      sel.innerHTML = robots.map(r => `<option value="${r.id}">No.${r.id}（${PERSONALITIES[r.type].name}）</option>`).join('');
+      sel.onchange = updatePreRaceOdds;
+      document.getElementById('prerace-bet-amount').value = 100;
+      document.getElementById('prerace-balance').innerText = playerBalance.toLocaleString() + ' 円';
+      document.getElementById('prerace-msg').innerText = '';
+      updatePreRaceOdds();
+      document.getElementById('prerace-modal').classList.add('open');
+    }
+
+    function updatePreRaceOdds() {
+      const id = parseInt(document.getElementById('prerace-bet-select').value, 10);
+      const bot = robots.find(r => r.id === id);
+      if (!bot) { document.getElementById('prerace-odds').innerText = '-'; return; }
+      const { oddsDecimal, winProb } = computeOdds(bot);
+      document.getElementById('prerace-odds').innerText = `${oddsDecimal}x（勝率 ${Math.round(winProb * 10000) / 100}%）`;
+    }
+
+    function startWithBet(doBet) {
+      if (doBet) {
+        const amount = Math.floor(Number(document.getElementById('prerace-bet-amount').value) || 0);
+        if (amount < 1) { document.getElementById('prerace-msg').innerText = '1円以上で賭けてください'; return; }
+        if (amount > playerBalance) { document.getElementById('prerace-msg').innerText = '残高が足りません'; return; }
+        const id = parseInt(document.getElementById('prerace-bet-select').value, 10);
+        const bot = robots.find(r => r.id === id);
+        if (!bot) return;
+        const { oddsDecimal, winProb } = computeOdds(bot);
+        currentBet = { botId: id, amount, odds: oddsDecimal, prob: winProb };
+        playerBalance -= amount;
+        document.getElementById('player-balance').innerText = playerBalance;
+        document.getElementById('bet-msg').innerText = `No.${id} に ${amount}円 賭けました（${oddsDecimal}x）`;
+        saveData();
+      }
+      closeModal('prerace-modal');
+      // スタート
+      lockBetting();
+      document.getElementById('start-controls').style.display = 'none';
+      document.getElementById('retry-controls').style.display = 'none';
+      timer = setInterval(stepAndCheckFinish, 40);
     }
 
     // ===================================================
@@ -1352,6 +1525,10 @@
     window.resetBalance = resetBalance;
     window.resetStats = resetStats;
     window.resetAll = resetAll;
+    window.openOtherProfile = openOtherProfile;
+    window.openPreRaceModal = openPreRaceModal;
+    window.updatePreRaceOdds = updatePreRaceOdds;
+    window.startWithBet = startWithBet;
   </script>
 </body>
 </html>
