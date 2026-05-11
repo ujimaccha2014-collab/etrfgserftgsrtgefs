@@ -1582,6 +1582,8 @@
       document.getElementById('rules-modal').classList.add('open');
     }
     window.openRules = openRules;
+
+    function resetBalance() {
       if (!confirm('残高を1000円にリセットしますか？')) return;
       playerBalance = 1000;
       stats.peakBalance = 1000;
@@ -1660,6 +1662,7 @@
     window.openPreRaceModal = openPreRaceModal;
     window.updatePreRaceOdds = updatePreRaceOdds;
     window.startWithBet = startWithBet;
+    window.appInit = appInit;
   </script>
 </body>
 </html>
