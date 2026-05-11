@@ -253,15 +253,15 @@
 
     .bet-info-bar {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 3px;
       background: #fffde7;
       border-radius: 7px;
-      padding: 5px 8px;
+      padding: 6px 8px;
       font-size: 12px;
       margin-bottom: 7px;
-      gap: 8px;
     }
-    .bet-info-bar span { white-space: nowrap; }
+    .bet-info-bar span { white-space: normal; word-break: break-all; }
 
     #bet-msg { min-height: 1.1em; display: block; margin-top: 3px; color: #444; font-size: 11px; }
     .bet-button {
