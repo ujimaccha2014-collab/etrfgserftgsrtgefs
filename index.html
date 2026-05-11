@@ -74,39 +74,41 @@
       position: fixed;
       top: 10px;
       left: 10px;
-      width: 185px;
+      width: 210px;
       background: rgba(255,255,255,0.97);
       border: 3px solid #ffcc80;
       border-radius: 12px;
-      padding: 8px 9px;
+      padding: 10px 12px;
       z-index: 400;
-      font-size: 11px;
+      font-size: 13px;
     }
     .rank-title {
       font-weight: bold;
+      font-size: 14px;
       color: #f57c00;
-      border-bottom: 1px solid #ffedb8;
-      margin-bottom: 4px;
-      padding-bottom: 2px;
+      border-bottom: 2px solid #ffedb8;
+      margin-bottom: 6px;
+      padding-bottom: 3px;
     }
     .rank-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
+      line-height: 1.5;
     }
     .rank-last-box {
-      margin-top: 5px;
+      margin-top: 6px;
       color: #ff7043;
       border-top: 2px dashed #ffcc80;
-      padding-top: 4px;
+      padding-top: 5px;
     }
 
     /* ===== プロフィール・ランキングボタン (leaderboard右隣に縦並び) ===== */
     #side-buttons {
       position: fixed;
       top: 10px;
-      left: 203px;
+      left: 228px;
       display: flex;
       flex-direction: column;
       gap: 5px;
@@ -150,28 +152,28 @@
       position: fixed;
       bottom: 10px;
       left: 10px;
-      width: 225px;
+      width: 250px;
       background: rgba(255,255,255,0.97);
       border: 3px solid #aed581;
       border-radius: 16px;
-      padding: 12px;
+      padding: 14px;
       z-index: 300;
       box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     }
     .personality-tag {
       display: inline-block;
       background: #fff9c4;
-      padding: 2px 7px;
+      padding: 3px 9px;
       border-radius: 10px;
-      font-size: 11px;
+      font-size: 13px;
       margin-top: 4px;
       color: #f57c00;
       font-weight: bold;
     }
-    .stat-stars { color: #fbc02d; letter-spacing: 2px; font-family: monospace; }
+    .stat-stars { color: #fbc02d; letter-spacing: 2px; font-family: monospace; font-size: 14px; }
     .gauge-bg {
       width: 100%;
-      height: 10px;
+      height: 12px;
       background: #eee;
       margin-top: 8px;
       border-radius: 5px;
@@ -601,12 +603,12 @@
 
   <!-- 左下：ステータスモニター -->
   <div id="status-monitor">
-    <div id="mon-name" style="font-size:20px;font-weight:bold;">--</div>
+    <div id="mon-name" style="font-size:22px;font-weight:bold;">--</div>
     <div id="mon-type-tag" class="personality-tag">--</div>
-    <div style="font-size:12px;margin-top:5px;">はやさ: <span id="mon-stat-spd" class="stat-stars"></span></div>
-    <div style="font-size:12px;">スタミナ: <span id="mon-stat-stm" class="stat-stars"></span></div>
-    <div style="font-size:13px;margin-top:6px;">きょり: <span id="mon-dist" style="font-weight:bold;color:#689f38;">0</span>m</div>
-    <div id="mon-desc" style="font-size:11px;color:#666;margin-top:3px;">--</div>
+    <div style="font-size:14px;margin-top:6px;">はやさ: <span id="mon-stat-spd" class="stat-stars"></span></div>
+    <div style="font-size:14px;">スタミナ: <span id="mon-stat-stm" class="stat-stars"></span></div>
+    <div style="font-size:15px;margin-top:7px;">きょり: <span id="mon-dist" style="font-weight:bold;color:#689f38;">0</span>m</div>
+    <div id="mon-desc" style="font-size:13px;color:#666;margin-top:4px;">--</div>
     <div class="gauge-bg"><div id="mon-energy" class="gauge-fill"></div></div>
   </div>
 
@@ -649,7 +651,7 @@
 
   <!-- レース終了後「もう一回」ボタン -->
   <div id="retry-controls" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:200; display:none; flex-direction:column; align-items:center; gap:10px;">
-    <button class="start-btn" style="background:#81c784; box-shadow:0 4px 0 #388e3c;" onclick="openPreRaceModal()">🔄 もう一回！</button>
+    <button class="start-btn" style="background:#81c784; box-shadow:0 4px 0 #388e3c;" onclick="resetRace()">🔄 もう一回！</button>
     <button onclick="resetRace()" style="background:none;border:none;color:#999;cursor:pointer;">はじめからやり直す</button>
   </div>
 
@@ -882,6 +884,37 @@
   </script>
 
   <script>
+    // 日本語大数フォーマット（万〜無量大数）
+    function formatMoney(n) {
+      const units = [
+        { v: 1e68, s: '無量大数' },
+        { v: 1e64, s: '不可思議' },
+        { v: 1e60, s: '那由他' },
+        { v: 1e56, s: '阿僧祇' },
+        { v: 1e52, s: '恒河沙' },
+        { v: 1e48, s: '極' },
+        { v: 1e44, s: '載' },
+        { v: 1e40, s: '正' },
+        { v: 1e36, s: '澗' },
+        { v: 1e32, s: '溝' },
+        { v: 1e28, s: '穣' },
+        { v: 1e24, s: '𥝱' },
+        { v: 1e20, s: '垓' },
+        { v: 1e16, s: '京' },
+        { v: 1e12, s: '兆' },
+        { v: 1e8,  s: '億' },
+        { v: 1e4,  s: '万' },
+      ];
+      if (n < 10000) return n.toLocaleString();
+      for (const u of units) {
+        if (n >= u.v) {
+          const top = Math.floor(n / u.v * 10) / 10;
+          return top + u.s;
+        }
+      }
+      return n.toLocaleString();
+    }
+
     const LS_BALANCE  = 'roborace_balance';
     const LS_PROFILE  = 'roborace_profile';
     const LS_STATS    = 'roborace_stats';
@@ -926,12 +959,12 @@
       document.getElementById('edit-name').value = profile.name;
       document.getElementById('edit-spirit').value = profile.spirit;
       const winRate = stats.totalBets > 0 ? (stats.wins / stats.totalBets * 100).toFixed(1) : '0.0';
-      document.getElementById('ps-balance').innerText = playerBalance.toLocaleString() + ' 円';
+      document.getElementById('ps-balance').innerText = formatMoney(playerBalance) + ' 円';
       document.getElementById('ps-total').innerText = stats.totalBets + ' 回';
       document.getElementById('ps-wins').innerText = stats.wins + ' 回';
       document.getElementById('ps-rate').innerText = winRate + '%';
-      document.getElementById('ps-peak').innerText = stats.peakBalance.toLocaleString() + ' 円';
-      document.getElementById('ps-earned').innerText = stats.totalEarned.toLocaleString() + ' 円';
+      document.getElementById('ps-peak').innerText = formatMoney(stats.peakBalance) + ' 円';
+      document.getElementById('ps-earned').innerText = formatMoney(stats.totalEarned) + ' 円';
       renderBetHistory();
       document.getElementById('profile-modal').classList.add('open');
     }
@@ -1011,7 +1044,7 @@
             <span class="ranking-medal">${medals[i] || (i+1) + '.'}</span>
             <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#f57c00">（あなた）</small>' : ''}</span>
             <div style="text-align:right;">
-              <div class="ranking-value">${(u.balance||0).toLocaleString()} 円</div>
+              <div class="ranking-value">${formatMoney(u.balance||0)} 円</div>
               <div class="ranking-sub">${u.totalBets||0}回中${u.wins||0}回</div>
             </div>
             <span style="color:#ccc;font-size:16px;margin-left:4px;">›</span>
@@ -1046,7 +1079,7 @@
       document.getElementById('op-avatar').style.background = `linear-gradient(135deg, hsl(${hue},60%,70%), hsl(${(hue+80)%360},55%,65%))`;
       document.getElementById('op-name').innerText = escHtml(u.name);
       document.getElementById('op-spirit').innerText = u.spirit || '（意気込み未設定）';
-      document.getElementById('op-balance').innerText = (u.balance || 0).toLocaleString() + ' 円';
+      document.getElementById('op-balance').innerText = formatMoney(u.balance || 0) + ' 円';
       document.getElementById('op-total').innerText = (u.totalBets || 0) + ' 回';
       document.getElementById('op-wins').innerText = (u.wins || 0) + ' 回';
       document.getElementById('op-rate').innerText = winRate + '%';
@@ -1221,7 +1254,7 @@
       for (let i = 1; i <= 100; i++) {
         sel.insertAdjacentHTML('beforeend', `<option value="${i}">No.${i}</option>`);
       }
-      document.getElementById('player-balance').innerText = playerBalance;
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       document.getElementById('place-bet').onclick = placeBet;
       document.getElementById('cancel-bet').onclick = cancelBet;
       document.getElementById('bet-select').onchange = updateOddsDisplay;
@@ -1264,7 +1297,7 @@
       const { oddsDecimal, winProb } = computeOdds(bot);
       currentBet = { botId: id, amount, odds: oddsDecimal, prob: winProb };
       playerBalance -= amount;
-      document.getElementById('player-balance').innerText = playerBalance;
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       saveData();
       showBetMsg(`No.${id} に ${amount}円 賭けました（${oddsDecimal}x）`);
     }
@@ -1274,7 +1307,7 @@
       if (bettingLocked) { showBetMsg('レース中は取り消せません'); return; }
       playerBalance += currentBet.amount;
       currentBet = null;
-      document.getElementById('player-balance').innerText = playerBalance;
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       saveData();
       showBetMsg('賭けを取り消しました');
     }
@@ -1306,7 +1339,7 @@
         betHistory.push({ botId: currentBet.botId, amount: currentBet.amount, win: won, payout });
         if (playerBalance > stats.peakBalance) stats.peakBalance = playerBalance;
         currentBet = null;
-        document.getElementById('player-balance').innerText = playerBalance;
+        document.getElementById('player-balance').innerText = formatMoney(playerBalance);
         saveData();
         syncToFirebase();
       } else {
@@ -1412,7 +1445,7 @@
       sel.innerHTML = robots.map(r => `<option value="${r.id}">No.${r.id}（${PERSONALITIES[r.type].name}）</option>`).join('');
       sel.onchange = updatePreRaceOdds;
       document.getElementById('prerace-bet-amount').value = 100;
-      document.getElementById('prerace-balance').innerText = playerBalance.toLocaleString() + ' 円';
+      document.getElementById('prerace-balance').innerText = formatMoney(playerBalance) + ' 円';
       document.getElementById('prerace-msg').innerText = '';
       updatePreRaceOdds();
       document.getElementById('prerace-modal').classList.add('open');
@@ -1437,7 +1470,7 @@
         const { oddsDecimal, winProb } = computeOdds(bot);
         currentBet = { botId: id, amount, odds: oddsDecimal, prob: winProb };
         playerBalance -= amount;
-        document.getElementById('player-balance').innerText = playerBalance;
+        document.getElementById('player-balance').innerText = formatMoney(playerBalance);
         document.getElementById('bet-msg').innerText = `No.${id} に ${amount}円 賭けました（${oddsDecimal}x）`;
         saveData();
       }
@@ -1454,9 +1487,9 @@
       stats.peakBalance = 1000;
       saveData();
       syncToFirebase();
-      document.getElementById('player-balance').innerText = playerBalance;
-      document.getElementById('ps-balance').innerText = playerBalance.toLocaleString() + ' 円';
-      document.getElementById('ps-peak').innerText = stats.peakBalance.toLocaleString() + ' 円';
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+      document.getElementById('ps-balance').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('ps-peak').innerText = formatMoney(stats.peakBalance) + ' 円';
       showToast('💰 残高を1000円にリセットしました');
     }
 
@@ -1484,16 +1517,16 @@
       currentBet = null;
       saveData();
       syncToFirebase();
-      document.getElementById('player-balance').innerText = playerBalance;
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       document.getElementById('prof-display-name').innerText = profile.name;
       document.getElementById('prof-display-spirit').innerText = profile.spirit;
       document.getElementById('edit-name').value = profile.name;
       document.getElementById('edit-spirit').value = profile.spirit;
-      document.getElementById('ps-balance').innerText = '1,000 円';
+      document.getElementById('ps-balance').innerText = formatMoney(1000) + ' 円';
       document.getElementById('ps-total').innerText = '0 回';
       document.getElementById('ps-wins').innerText = '0 回';
       document.getElementById('ps-rate').innerText = '0.0%';
-      document.getElementById('ps-peak').innerText = '1,000 円';
+      document.getElementById('ps-peak').innerText = formatMoney(1000) + ' 円';
       document.getElementById('ps-earned').innerText = '0 円';
       renderBetHistory();
       showToast('🗑️ すべてリセットしました');
