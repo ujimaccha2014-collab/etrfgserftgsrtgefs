@@ -624,6 +624,15 @@
         <button class="save-btn" onclick="saveProfile()">💾 保存する</button>
       </div>
 
+      <div style="margin-top:16px; border-top: 2px dashed #ffccbc; padding-top:14px;">
+        <div style="font-weight:bold;color:#e57373;font-size:12px;margin-bottom:8px;">⚠️ データのリセット</div>
+        <div style="display:flex; gap:8px;">
+          <button onclick="resetBalance()" style="flex:1;padding:9px;background:#fff3e0;color:#ef6c00;border:2px solid #ffcc80;border-radius:10px;font-size:13px;font-weight:bold;cursor:pointer;" title="残高を1000円に戻す">💰 残高リセット</button>
+          <button onclick="resetStats()" style="flex:1;padding:9px;background:#fce4ec;color:#c62828;border:2px solid #ef9a9a;border-radius:10px;font-size:13px;font-weight:bold;cursor:pointer;" title="統計・履歴をリセット">📊 統計リセット</button>
+        </div>
+        <button onclick="resetAll()" style="width:100%;margin-top:8px;padding:9px;background:#ffebee;color:#b71c1c;border:2px solid #ef9a9a;border-radius:10px;font-size:13px;font-weight:bold;cursor:pointer;">🗑️ すべてリセット（残高・統計・名前）</button>
+      </div>
+
       <div style="margin-top:16px;">
         <div style="font-weight:bold;color:#888;font-size:12px;margin-bottom:8px;">📋 直近の賭け履歴</div>
         <div id="bet-history-list">
@@ -736,7 +745,9 @@
     // ===================================================
     function loadData() {
       playerBalance = parseInt(localStorage.getItem(LS_BALANCE) || '1000', 10);
-      profile = JSON.parse(localStorage.getItem(LS_PROFILE) || '{"name":"ゲスト","spirit":"よろしく！"}');
+      // デフォルト名を「プレイヤー＋ランダム3桁」に
+      const defaultName = 'プレイヤー' + (Math.floor(Math.random() * 900) + 100);
+      profile = JSON.parse(localStorage.getItem(LS_PROFILE) || `{"name":"${defaultName}","spirit":"よろしく！"}`);
       stats = JSON.parse(localStorage.getItem(LS_STATS) || '{"totalBets":0,"wins":0,"peakBalance":1000,"totalEarned":0}');
       betHistory = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
       if (!localStorage.getItem(LS_USERID)) {
@@ -763,7 +774,7 @@
     // PROFILE & STATS
     // ===================================================
     let playerBalance = 1000;
-    let profile = { name: 'ゲスト', spirit: 'よろしく！' };
+    let profile = { name: 'プレイヤー', spirit: 'よろしく！' };
     let stats = { totalBets: 0, wins: 0, peakBalance: 1000, totalEarned: 0 };
     let betHistory = [];
     let userId = '';
@@ -1060,7 +1071,7 @@
     // BET
     // ===================================================
     let currentBet = null;
-    const minBet = 10;
+    const minBet = 1;
     let bettingLocked = false;
 
     function initBetUI() {
@@ -1104,7 +1115,7 @@
     function placeBet() {
       if (bettingLocked) { showBetMsg('レース中は賭けられません'); return; }
       const amount = Math.floor(Number(document.getElementById('bet-amount').value) || 0);
-      if (isNaN(amount) || amount < minBet) { showBetMsg(`最少賭け金は ${minBet} 円です`); return; }
+      if (isNaN(amount) || amount < 1) { showBetMsg('1円以上で賭けてください'); return; }
       if (amount > playerBalance) { showBetMsg('残高不足です'); return; }
       const id = parseInt(document.getElementById('bet-select').value, 10);
       const bot = robots.find(r => r.id === id);
@@ -1257,6 +1268,61 @@
     }
 
     // ===================================================
+    // DATA RESET FUNCTIONS
+    // ===================================================
+    function resetBalance() {
+      if (!confirm('残高を1000円にリセットしますか？')) return;
+      playerBalance = 1000;
+      stats.peakBalance = 1000;
+      saveData();
+      syncToFirebase();
+      document.getElementById('player-balance').innerText = playerBalance;
+      // プロフィール表示も更新
+      document.getElementById('ps-balance').innerText = playerBalance.toLocaleString() + ' 円';
+      document.getElementById('ps-peak').innerText = stats.peakBalance.toLocaleString() + ' 円';
+      showToast('💰 残高を1000円にリセットしました');
+    }
+
+    function resetStats() {
+      if (!confirm('統計と賭け履歴をリセットしますか？')) return;
+      stats = { totalBets: 0, wins: 0, peakBalance: playerBalance, totalEarned: 0 };
+      betHistory = [];
+      saveData();
+      syncToFirebase();
+      document.getElementById('ps-total').innerText = '0 回';
+      document.getElementById('ps-wins').innerText = '0 回';
+      document.getElementById('ps-rate').innerText = '0.0%';
+      document.getElementById('ps-earned').innerText = '0 円';
+      renderBetHistory();
+      showToast('📊 統計をリセットしました');
+    }
+
+    function resetAll() {
+      if (!confirm('すべてのデータ（残高・統計・名前）をリセットしますか？\nこの操作は元に戻せません。')) return;
+      const newName = 'プレイヤー' + (Math.floor(Math.random() * 900) + 100);
+      playerBalance = 1000;
+      profile = { name: newName, spirit: 'よろしく！' };
+      stats = { totalBets: 0, wins: 0, peakBalance: 1000, totalEarned: 0 };
+      betHistory = [];
+      currentBet = null;
+      saveData();
+      syncToFirebase();
+      document.getElementById('player-balance').innerText = playerBalance;
+      document.getElementById('prof-display-name').innerText = profile.name;
+      document.getElementById('prof-display-spirit').innerText = profile.spirit;
+      document.getElementById('edit-name').value = profile.name;
+      document.getElementById('edit-spirit').value = profile.spirit;
+      document.getElementById('ps-balance').innerText = '1,000 円';
+      document.getElementById('ps-total').innerText = '0 回';
+      document.getElementById('ps-wins').innerText = '0 回';
+      document.getElementById('ps-rate').innerText = '0.0%';
+      document.getElementById('ps-peak').innerText = '1,000 円';
+      document.getElementById('ps-earned').innerText = '0 円';
+      renderBetHistory();
+      showToast('🗑️ すべてリセットしました');
+    }
+
+    // ===================================================
     // APP INIT
     // ===================================================
     function appInit() {
@@ -1283,6 +1349,9 @@
     window.openRanking = openRanking;
     window.switchTab = switchTab;
     window.closeModal = closeModal;
+    window.resetBalance = resetBalance;
+    window.resetStats = resetStats;
+    window.resetAll = resetAll;
   </script>
 </body>
 </html>
