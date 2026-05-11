@@ -909,7 +909,7 @@
       for (const u of units) {
         if (n >= u.v) {
           const top = Math.floor(n / u.v * 10) / 10;
-          return top + u.s;
+          return top + u.s + '(' + n.toLocaleString() + ')';
         }
       }
       return n.toLocaleString();
