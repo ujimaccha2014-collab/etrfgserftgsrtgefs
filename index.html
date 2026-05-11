@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>100ロボ・のんびりおさんぽレース</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #f0f9ff;
+      margin: 0;
+      font-family: "Hiragino Sans", "Noto Sans JP", sans-serif;
+      overflow: hidden;
+      color: #556b2f;
+    }
+
+    /* ===== RACE ===== */
+    #race-window {
+      width: 100vw;
+      height: 50vh;
+      overflow: hidden;
+      background: #e1f5fe;
+      position: relative;
+      border-bottom: 8px solid #aed581;
+    }
+    #track {
+      width: 15500px;
+      height: 100%;
+      position: relative;
+      background-color: #f1f8e9;
+    }
+    .goal-line {
+      position: absolute;
+      left: 15000px;
+      width: 100px;
+      height: 100%;
+      background: #fff9c4;
+      border-left: 5px dashed #ffcc80;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #ffb74d;
+    }
+    .robot {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 3px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: white;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    .target-bot {
+      border: 4px solid #ff8a65 !important;
+      transform: scale(1.2);
+      z-index: 100;
+      box-shadow: 0 0 15px #ffab91;
+    }
+    .resting {
+      opacity: 0.5;
+      filter: grayscale(0.5);
+      transform: scale(0.8);
+    }
+
+    /* ===== LEADERBOARD (左上) ===== */
+    #leaderboard {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 220px;
+      background: rgba(255,255,255,0.95);
+      border: 3px solid #ffcc80;
+      border-radius: 15px;
+      padding: 10px;
+      z-index: 400;
+      font-size: 12px;
+    }
+    .rank-title {
+      font-weight: bold;
+      color: #f57c00;
+      border-bottom: 1px solid #ffedb8;
+      margin-bottom: 5px;
+      padding-bottom: 2px;
+    }
+    .rank-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+    .rank-last-box {
+      margin-top: 8px;
+      color: #ff7043;
+      border-top: 2px dashed #ffcc80;
+      padding-top: 5px;
+    }
+
+    /* ===== STATUS (左下) ===== */
+    #status-monitor {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 280px;
+      background: rgba(255,255,255,0.95);
+      border: 3px solid #aed581;
+      border-radius: 20px;
+      padding: 15px;
+      z-index: 300;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .personality-tag {
+      display: inline-block;
+      background: #fff9c4;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      margin-top: 5px;
+      color: #f57c00;
+      font-weight: bold;
+    }
+    .stat-stars { color: #fbc02d; letter-spacing: 2px; font-family: monospace; }
+    .gauge-bg {
+      width: 100%;
+      height: 10px;
+      background: #eee;
+      margin-top: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .gauge-fill {
+      height: 100%;
+      background: #81c784;
+      width: 100%;
+      transition: width 0.3s;
+    }
+
+    /* ===== BET PANEL (右上) ===== */
+    #bet-panel {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      width: 320px;
+      background: rgba(255,255,255,0.95);
+      border: 3px solid #ffd54f;
+      border-radius: 12px;
+      padding: 10px;
+      z-index: 450;
+      font-size: 13px;
+    }
+    #bet-panel .title {
+      font-weight: bold;
+      color: #ef6c00;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #bet-panel input[type="number"] { -moz-appearance: textfield; }
+    #bet-panel input::-webkit-outer-spin-button,
+    #bet-panel input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    #bet-msg { min-height: 1.2em; display: block; margin-top: 6px; color: #444; font-size: 12px; }
+    .bet-button {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      text-align: center;
+      width: 48%;
+    }
+    #place-bet { background-color: #81d4fa; color: white; border: none; }
+    #place-bet:hover { background-color: #64b5f6; transform: scale(1.05); }
+    #place-bet:active { transform: scale(0.95); }
+    #cancel-bet { background-color: #e0e0e0; color: #556b2f; border: none; }
+    #cancel-bet:hover { background-color: #d0d0d0; transform: scale(1.05); }
+    #cancel-bet:active { transform: scale(0.95); }
+    .prob-small { color: #777; font-size: 12px; margin-left: 8px; }
+    #top5 {
+      margin-top: 8px;
+      border-top: 1px dashed #eee;
+      padding-top: 8px;
+      font-size: 13px;
+    }
+    .top5-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    /* ===== SELECTION (右下) ===== */
+    #selection-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 280px;
+      height: auto;
+      background: rgba(255,255,255,0.9);
+      border: 3px solid #81d4fa;
+      border-radius: 20px;
+      padding: 10px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+    }
+    #bot-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 3px;
+      overflow-y: auto;
+      padding: 5px;
+    }
+    .bot-btn {
+      width: 100%;
+      aspect-ratio: 1;
+      border: none;
+      border-radius: 5px;
+      font-size: 9px;
+      cursor: pointer;
+      color: white;
+      transition: transform 0.1s ease;
+    }
+    .bot-btn.active { outline: 3px solid #ff8a65; transform: scale(1.1); z-index: 2; }
+    .bot-btn:hover { transform: scale(1.05); }
+    #filter-controls { margin-bottom: 5px; }
+    #filter-controls label { font-size: 12px; margin-right: 5px; }
+    #filter-select, #stat-select {
+      padding: 4px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+    #stat-filter { margin-bottom: 5px; }
+    #stat-filter label { font-size: 12px; margin-right: 5px; }
+    #stat-range { width: 100%; }
+
+    /* ===== CONTROLS (中央) ===== */
+    .controls {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 200;
+    }
+    .start-btn {
+      padding: 15px 50px;
+      font-size: 20px;
+      background: #ffb74d;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 0 #f57c00;
+      margin-bottom: 10px;
+      transition: background-color 0.2s ease;
+    }
+    .start-btn:hover { background-color: #f57c00; }
+
+    /* ===== MODAL BASE ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px;
+      width: 420px;
+      max-width: 95vw;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ef6c00;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .close-btn {
+      background: #eee;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-btn:hover { background: #ddd; }
+
+    /* ===== PROFILE MODAL ===== */
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #81d4fa, #aed581);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 12px;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .profile-stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 14px;
+    }
+    .profile-stat-label { color: #888; }
+    .profile-stat-value { font-weight: bold; color: #333; }
+    .edit-field {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+    .edit-field:focus { outline: none; border-color: #81d4fa; }
+    .save-btn {
+      width: 100%;
+      padding: 10px;
+      background: #81d4fa;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .save-btn:hover { background: #4fc3f7; }
+    .bet-history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 13px;
+    }
+    .bet-win { color: #388e3c; font-weight: bold; }
+    .bet-lose { color: #c62828; font-weight: bold; }
+
+    /* ===== RANKING MODAL ===== */
+    .ranking-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #ffb74d;
+      border-color: #ffb74d;
+      color: white;
+    }
+    .ranking-row {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 14px;
+      gap: 10px;
+    }
+    .ranking-medal {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+    .ranking-name { flex: 1; font-weight: bold; }
+    .ranking-value { color: #ef6c00; font-weight: bold; }
+    .ranking-sub { color: #aaa; font-size: 12px; }
+
+    /* ===== PROFILE BTN (右上隅) ===== */
+    #profile-btn {
+      position: fixed;
+      top: 15px;
+      left: 250px;
+      background: rgba(255,255,255,0.95);
+      border: 3px solid #aed581;
+      border-radius: 12px;
+      padding: 6px 12px;
+      z-index: 500;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      color: #556b2f;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #profile-btn:hover { background: #e8f5e9; }
+
+    #ranking-btn {
+      position: fixed;
+      top: 55px;
+      left: 250px;
+      background: rgba(255,255,255,0.95);
+      border: 3px solid #ffd54f;
+      border-radius: 12px;
+      padding: 6px 12px;
+      z-index: 500;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      color: #ef6c00;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #ranking-btn:hover { background: #fff8e1; }
+
+    /* ===== TOAST ===== */
+    #toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+
+    /* Firebase status */
+    #firebase-status {
+      position: fixed;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: #aaa;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body onload="appInit()">
+
+  <!-- 左上：じゅんい表 -->
+  <div id="leaderboard">
+    <div class="rank-title">今のじゅんい</div>
+    <div id="ranks-top"></div>
+    <div id="rank-last-area" class="rank-last-box"></div>
+  </div>
+
+  <!-- レース画面 -->
+  <div id="race-window">
+    <div id="track">
+      <div class="goal-line">GOAL</div>
+    </div>
+  </div>
+
+  <!-- 右上：賭けパネル -->
+  <div id="bet-panel">
+    <div class="title">
+      <span>🎰 レース賭け</span>
+    </div>
+    <div style="margin-bottom:6px;">
+      <label>選択: </label>
+      <select id="bet-select" style="width:100%; margin-top:4px;"></select>
+    </div>
+    <div style="margin-bottom:6px;">
+      <label>賭け金（円）: </label>
+      <input id="bet-amount" type="number" min="10" value="100" style="width:100%; margin-top:4px; padding:4px 8px; border-radius:8px; border:1px solid #ccc;" />
+    </div>
+    <div style="display:flex; justify-content:space-between; gap:6px; margin-bottom:6px;">
+      <button id="place-bet" class="bet-button">賭ける</button>
+      <button id="cancel-bet" class="bet-button">取り消し</button>
+    </div>
+    <div style="font-size:12px; margin-bottom:6px;">
+      オッズ: <span id="bet-odds">-</span>　残高: <span id="player-balance">1000</span>円
+    </div>
+    <div id="top5">
+      <div style="font-weight:bold; margin-bottom:4px;">勝ちやすい子（上位5）</div>
+      <div id="top5-list"></div>
+    </div>
+    <div id="bet-msg"><small></small></div>
+  </div>
+
+  <!-- プロフィールボタン -->
+  <button id="profile-btn" onclick="openProfile()">👤 プロフィール</button>
+  <button id="ranking-btn" onclick="openRanking()">🏆 ランキング</button>
+
+  <!-- 左下：ステータスモニター -->
+  <div id="status-monitor">
+    <div id="mon-name" style="font-size:22px;font-weight:bold;">--</div>
+    <div id="mon-type-tag" class="personality-tag">--</div>
+    <div style="font-size:12px;margin-top:5px;">はやさ: <span id="mon-stat-spd" class="stat-stars"></span></div>
+    <div style="font-size:12px;">スタミナ: <span id="mon-stat-stm" class="stat-stars"></span></div>
+    <div style="font-size:13px;margin-top:8px;">きょり: <span id="mon-dist" style="font-weight:bold;color:#689f38;">0</span>m</div>
+    <div id="mon-desc" style="font-size:11px;color:#666;margin-top:4px;">--</div>
+    <div class="gauge-bg"><div id="mon-energy" class="gauge-fill"></div></div>
+  </div>
+
+  <!-- 右下：セレクター -->
+  <div id="selection-panel">
+    <button id="auto-btn" onclick="targetId=null;updateUI();" style="width:100%;padding:5px;border-radius:10px;border:none;background:#81d4fa;color:white;font-weight:bold;margin-bottom:5px;cursor:pointer;">
+      ★ 1位の子をみる
+    </button>
+    <div id="filter-controls">
+      <label for="filter-select">タイプで絞り込み:</label>
+      <select id="filter-select" onchange="filterRobots()">
+        <option value="">すべて</option>
+        <option value="dash">だっしゅ</option>
+        <option value="relax">のんびり</option>
+        <option value="climb">しあげ</option>
+        <option value="random">きまぐれ</option>
+        <option value="warp">わーぷ</option>
+        <option value="tough">ねばり</option>
+        <option value="crowd">おまつり</option>
+        <option value="lucky">らっきー</option>
+      </select>
+    </div>
+    <div id="stat-filter">
+      <label for="stat-select">ステータスで絞り込み:</label>
+      <select id="stat-select" onchange="filterRobots()">
+        <option value="">すべて</option>
+        <option value="spd">はやさ</option>
+        <option value="stm">スタミナ</option>
+      </select>
+      <input type="range" id="stat-range" min="0" max="100" value="0" oninput="filterRobots()">
+    </div>
+    <div id="bot-grid"></div>
+  </div>
+
+  <!-- コントロールボタン -->
+  <div class="controls" id="start-controls">
+    <button class="start-btn" onclick="start()">みんなで出発！</button>
+    <button onclick="resetRace()" style="background:none;border:none;color:#999;cursor:pointer;">はじめからやり直す</button>
+  </div>
+
+  <!-- ===== PROFILE MODAL ===== -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>👤 プロフィール</span>
+        <button class="close-btn" onclick="closeModal('profile-modal')">✕</button>
+      </div>
+      <div class="profile-avatar">🤖</div>
+      <div style="text-align:center; margin-bottom:16px;">
+        <div id="prof-display-name" style="font-size:20px;font-weight:bold;color:#333;">---</div>
+        <div id="prof-display-spirit" style="font-size:13px;color:#888;margin-top:4px;">---</div>
+      </div>
+
+      <div id="prof-stats">
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">💰 残高</span>
+          <span class="profile-stat-value" id="ps-balance">-</span>
+        </div>
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">🎰 総賭け回数</span>
+          <span class="profile-stat-value" id="ps-total">-</span>
+        </div>
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">✅ 的中回数</span>
+          <span class="profile-stat-value" id="ps-wins">-</span>
+        </div>
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">📊 勝率</span>
+          <span class="profile-stat-value" id="ps-rate">-</span>
+        </div>
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">📈 最高残高</span>
+          <span class="profile-stat-value" id="ps-peak">-</span>
+        </div>
+        <div class="profile-stat-row">
+          <span class="profile-stat-label">💸 総獲得</span>
+          <span class="profile-stat-value" id="ps-earned">-</span>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div style="font-weight:bold;color:#888;font-size:12px;margin-bottom:8px;">✏️ プロフィール編集</div>
+        <input id="edit-name" class="edit-field" type="text" maxlength="16" placeholder="名前（最大16文字）" />
+        <input id="edit-spirit" class="edit-field" type="text" maxlength="40" placeholder="意気込み（最大40文字）" />
+        <button class="save-btn" onclick="saveProfile()">💾 保存する</button>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div style="font-weight:bold;color:#888;font-size:12px;margin-bottom:8px;">📋 直近の賭け履歴</div>
+        <div id="bet-history-list">
+          <div style="color:#aaa;font-size:13px;">まだ賭けがありません</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RANKING MODAL ===== -->
+  <div class="modal-overlay" id="ranking-modal">
+    <div class="modal-box">
+      <div class="modal-title">
+        <span>🏆 オンラインランキング</span>
+        <button class="close-btn" onclick="closeModal('ranking-modal')">✕</button>
+      </div>
+      <div id="firebase-warning" style="background:#fff3e0;border-radius:10px;padding:10px;margin-bottom:12px;font-size:13px;color:#e65100;display:none;">
+        ⚠️ Firebase未接続。ローカルデータのみ表示。
+      </div>
+      <div class="ranking-tabs">
+        <button class="tab-btn active" onclick="switchTab('balance')">💰 残高</button>
+        <button class="tab-btn" onclick="switchTab('winrate')">📊 勝率</button>
+      </div>
+      <div id="ranking-list">
+        <div style="text-align:center;color:#aaa;padding:20px;">読み込み中...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast"></div>
+  <div id="firebase-status">Firebase: 初期化中...</div>
+
+  <!-- ===== Firebase SDK ===== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, set, get, onValue, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // ─── Firebase 設定 ───────────────────────────────────────
+    const firebaseConfig = {
+      apiKey: "AIzaSyCaZa4hwDEGQ-V3x_37TpEDTnaucSmcmVQ",
+      authDomain: "kakegame.firebaseapp.com",
+      databaseURL: "https://kakegame-default-rtdb.firebaseio.com",
+      projectId: "kakegame",
+      storageBucket: "kakegame.firebasestorage.app",
+      messagingSenderId: "401886347565",
+      appId: "1:401886347565:web:6205101e07c111117cd3a4"
+    };
+    // ─────────────────────────────────────────────────────────
+
+    let db = null;
+    let firebaseOK = false;
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getDatabase(app);
+      firebaseOK = true;
+      document.getElementById('firebase-status').innerText = "Firebase: 接続済み ✅";
+    } catch(e) {
+      document.getElementById('firebase-status').innerText = "Firebase: 未接続（設定を確認してください）";
+      document.getElementById('firebase-warning').style.display = 'block';
+    }
+
+    // Firebaseへのランキング保存
+    window._fbSaveRanking = async function(userId, name, balance, totalBets, wins) {
+      if (!firebaseOK || !db) return;
+      try {
+        const winRate = totalBets > 0 ? Math.round((wins / totalBets) * 1000) / 10 : 0;
+        await set(ref(db, 'ranking/' + userId), {
+          name: name || 'ゲスト',
+          balance: balance,
+          totalBets: totalBets,
+          wins: wins,
+          winRate: winRate,
+          updatedAt: Date.now()
+        });
+      } catch(e) {
+        console.warn('Firebase save failed:', e);
+      }
+    };
+
+    // Firebaseランキング取得
+    window._fbGetRanking = async function() {
+      if (!firebaseOK || !db) return null;
+      try {
+        const snapshot = await get(ref(db, 'ranking'));
+        if (snapshot.exists()) {
+          return snapshot.val();
+        }
+        return {};
+      } catch(e) {
+        console.warn('Firebase get failed:', e);
+        return null;
+      }
+    };
+  </script>
+
+  <script>
+    // ===================================================
+    // LOCAL STORAGE KEYS
+    // ===================================================
+    const LS_BALANCE  = 'roborace_balance';
+    const LS_PROFILE  = 'roborace_profile';
+    const LS_STATS    = 'roborace_stats';
+    const LS_HISTORY  = 'roborace_history';
+    const LS_USERID   = 'roborace_userid';
+
+    // ===================================================
+    // PERSISTENT DATA
+    // ===================================================
+    function loadData() {
+      playerBalance = parseInt(localStorage.getItem(LS_BALANCE) || '1000', 10);
+      profile = JSON.parse(localStorage.getItem(LS_PROFILE) || '{"name":"ゲスト","spirit":"よろしく！"}');
+      stats = JSON.parse(localStorage.getItem(LS_STATS) || '{"totalBets":0,"wins":0,"peakBalance":1000,"totalEarned":0}');
+      betHistory = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+      if (!localStorage.getItem(LS_USERID)) {
+        const uid = 'user_' + Math.random().toString(36).slice(2,10);
+        localStorage.setItem(LS_USERID, uid);
+      }
+      userId = localStorage.getItem(LS_USERID);
+    }
+
+    function saveData() {
+      localStorage.setItem(LS_BALANCE, playerBalance);
+      localStorage.setItem(LS_PROFILE, JSON.stringify(profile));
+      localStorage.setItem(LS_STATS, JSON.stringify(stats));
+      localStorage.setItem(LS_HISTORY, JSON.stringify(betHistory.slice(-30)));
+    }
+
+    function syncToFirebase() {
+      if (typeof window._fbSaveRanking === 'function') {
+        window._fbSaveRanking(userId, profile.name, playerBalance, stats.totalBets, stats.wins);
+      }
+    }
+
+    // ===================================================
+    // PROFILE & STATS
+    // ===================================================
+    let playerBalance = 1000;
+    let profile = { name: 'ゲスト', spirit: 'よろしく！' };
+    let stats = { totalBets: 0, wins: 0, peakBalance: 1000, totalEarned: 0 };
+    let betHistory = [];
+    let userId = '';
+
+    function openProfile() {
+      document.getElementById('prof-display-name').innerText = profile.name;
+      document.getElementById('prof-display-spirit').innerText = profile.spirit;
+      document.getElementById('edit-name').value = profile.name;
+      document.getElementById('edit-spirit').value = profile.spirit;
+
+      const winRate = stats.totalBets > 0 ? (stats.wins / stats.totalBets * 100).toFixed(1) : '0.0';
+      document.getElementById('ps-balance').innerText = playerBalance.toLocaleString() + ' 円';
+      document.getElementById('ps-total').innerText = stats.totalBets + ' 回';
+      document.getElementById('ps-wins').innerText = stats.wins + ' 回';
+      document.getElementById('ps-rate').innerText = winRate + '%';
+      document.getElementById('ps-peak').innerText = stats.peakBalance.toLocaleString() + ' 円';
+      document.getElementById('ps-earned').innerText = stats.totalEarned.toLocaleString() + ' 円';
+
+      renderBetHistory();
+      document.getElementById('profile-modal').classList.add('open');
+    }
+
+    function saveProfile() {
+      const n = document.getElementById('edit-name').value.trim();
+      const s = document.getElementById('edit-spirit').value.trim();
+      if (n) profile.name = n;
+      if (s) profile.spirit = s;
+      saveData();
+      syncToFirebase();
+      document.getElementById('prof-display-name').innerText = profile.name;
+      document.getElementById('prof-display-spirit').innerText = profile.spirit;
+      showToast('プロフィールを保存しました！');
+    }
+
+    function renderBetHistory() {
+      const el = document.getElementById('bet-history-list');
+      if (betHistory.length === 0) {
+        el.innerHTML = '<div style="color:#aaa;font-size:13px;">まだ賭けがありません</div>';
+        return;
+      }
+      el.innerHTML = [...betHistory].reverse().slice(0, 15).map(h => `
+        <div class="bet-history-item">
+          <span>No.${h.botId} に ${h.amount}円</span>
+          <span class="${h.win ? 'bet-win' : 'bet-lose'}">${h.win ? '+' + h.payout + '円 ✅' : '外れ ❌'}</span>
+        </div>
+      `).join('');
+    }
+
+    // ===================================================
+    // RANKING
+    // ===================================================
+    let currentRankTab = 'balance';
+    let rankingData = {};
+
+    async function openRanking() {
+      document.getElementById('ranking-modal').classList.add('open');
+      document.getElementById('ranking-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">読み込み中...</div>';
+      
+      const fbData = await (typeof window._fbGetRanking === 'function' ? window._fbGetRanking() : Promise.resolve(null));
+      
+      if (fbData) {
+        rankingData = fbData;
+        // 自分のデータも確実に含める
+        rankingData[userId] = {
+          name: profile.name,
+          balance: playerBalance,
+          totalBets: stats.totalBets,
+          wins: stats.wins,
+          winRate: stats.totalBets > 0 ? Math.round(stats.wins / stats.totalBets * 1000) / 10 : 0,
+          updatedAt: Date.now()
+        };
+      } else {
+        // Firebaseなしの場合は自分だけ
+        rankingData = {
+          [userId]: {
+            name: profile.name,
+            balance: playerBalance,
+            totalBets: stats.totalBets,
+            wins: stats.wins,
+            winRate: stats.totalBets > 0 ? Math.round(stats.wins / stats.totalBets * 1000) / 10 : 0
+          }
+        };
+        document.getElementById('firebase-warning').style.display = 'block';
+      }
+      
+      renderRanking();
+    }
+
+    function switchTab(tab) {
+      currentRankTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderRanking();
+    }
+
+    function renderRanking() {
+      const list = Object.entries(rankingData).map(([id, d]) => ({ id, ...d }));
+      const medals = ['🥇','🥈','🥉'];
+
+      if (currentRankTab === 'balance') {
+        list.sort((a, b) => b.balance - a.balance);
+        document.getElementById('ranking-list').innerHTML = list.slice(0, 20).map((u, i) => `
+          <div class="ranking-row" style="${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
+            <span class="ranking-medal">${medals[i] || (i+1) + '.'}</span>
+            <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#aaa">(あなた)</small>' : ''}</span>
+            <div style="text-align:right;">
+              <div class="ranking-value">${(u.balance||0).toLocaleString()} 円</div>
+              <div class="ranking-sub">${u.totalBets||0}回中${u.wins||0}回</div>
+            </div>
+          </div>`).join('');
+      } else {
+        list.filter(u => (u.totalBets || 0) >= 3).sort((a, b) => b.winRate - a.winRate);
+        const filtered = list.filter(u => (u.totalBets || 0) >= 3);
+        if (filtered.length === 0) {
+          document.getElementById('ranking-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;font-size:13px;">3回以上賭けたプレイヤーがいません</div>';
+          return;
+        }
+        document.getElementById('ranking-list').innerHTML = filtered.slice(0, 20).map((u, i) => `
+          <div class="ranking-row" style="${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
+            <span class="ranking-medal">${medals[i] || (i+1) + '.'}</span>
+            <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#aaa">(あなた)</small>' : ''}</span>
+            <div style="text-align:right;">
+              <div class="ranking-value">${u.winRate||0}%</div>
+              <div class="ranking-sub">${u.totalBets||0}戦 / ${u.wins||0}勝</div>
+            </div>
+          </div>`).join('');
+      }
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // ===================================================
+    // TOAST
+    // ===================================================
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // ===================================================
+    // RACE ENGINE
+    // ===================================================
+    const track = document.getElementById('track');
+    const winEl = document.getElementById('race-window');
+    const grid = document.getElementById('bot-grid');
+
+    let robots = [];
+    let 終わり = [];
+    let timer = null;
+    let targetId = null;
+    let filteredRobots = [];
+    const goalPx = 15000;
+
+    const PERSONALITIES = {
+      dash:   { name: "だっしゅ",   desc: "さいしょは とっても はやいよ！" },
+      relax:  { name: "のんびり",   desc: "ゆっくりだけど つかれにくいよ。" },
+      climb:  { name: "しあげ",     desc: "ゴールの ちかくで 本気を だすよ！" },
+      random: { name: "きまぐれ",   desc: "はしったり とまったり、きぶんやさん。" },
+      warp:   { name: "わーぷ",     desc: "たまに ぴょん！と 前に すすむよ。" },
+      tough:  { name: "ねばり",     desc: "つかれても、ゆっくり はしりつづけるよ。" },
+      crowd:  { name: "おまつり",   desc: "まわりに ロボットが 多いと はりきるよ！" },
+      lucky:  { name: "らっきー",   desc: "たまに すごい スピードが 出るよ。" }
+    };
+
+    function getStars(val, min, max) {
+      const starCount = Math.round(((val - min) / (max - min)) * 4) + 1;
+      const starsOn = Math.max(1, Math.min(5, starCount));
+      return "★".repeat(starsOn) + "☆".repeat(5 - starsOn);
+    }
+
+    function initRace() {
+      track.querySelectorAll('.robot').forEach(r => r.remove());
+      grid.innerHTML = '';
+      robots = [];
+      終わり = [];
+      filteredRobots = [];
+      if (timer) clearInterval(timer);
+      timer = null;
+      targetId = null;
+
+      for (let i = 1; i <= 100; i++) {
+        const keys = Object.keys(PERSONALITIES);
+        const type = keys[Math.floor(Math.random() * keys.length)];
+        const color = `hsl(${Math.random() * 360}, 60%, 70%)`;
+        const bSpd = 3 + Math.random() * 5;
+        const mEne = 700 + Math.random() * 1000;
+
+        const botEl = document.createElement('div');
+        botEl.className = 'robot';
+        botEl.style.top = Math.random() * (track.offsetHeight - 60) + 10 + 'px';
+        botEl.style.left = '0px';
+        botEl.style.background = color;
+        botEl.innerText = i;
+        track.appendChild(botEl);
+
+        robots.push({
+          id: i, el: botEl, x: 0, color,
+          type, maxEnergy: mEne, energy: mEne,
+          baseSpeed: bSpd, done: false,
+          statSpd: getStars(bSpd, 3, 8),
+          statStm: getStars(mEne, 700, 1700)
+        });
+      }
+
+      filteredRobots = [...robots];
+      document.getElementById('start-controls').style.display = 'flex';
+      updateUI();
+      initBetUI();
+    }
+
+    function update() {
+      robots.forEach(r => {
+        if (r.done) return;
+        let s = r.baseSpeed;
+        if (r.type === 'dash' && r.x < 4000) s *= 1.8;
+        if (r.type === 'relax') r.energy -= 0.3; else r.energy -= 1.1;
+        if (r.type === 'climb' && r.x > 10000) s *= 2.2;
+        if (r.type === 'random') s = (Math.random() > 0.8) ? 0 : s * 2.5;
+        if (r.type === 'warp' && Math.random() > 0.985) r.x += 200;
+        if (r.type === 'crowd') {
+          const near = robots.filter(o => Math.abs(o.x - r.x) < 200).length;
+          s += (near * 0.5);
+        }
+        if (r.type === 'lucky' && Math.random() > 0.96) s *= 4.5;
+        if (r.energy <= 0) {
+          r.energy = 0;
+          s = (r.type === 'tough') ? s * 0.6 : s * 0.15;
+          r.el.classList.add('resting');
+        }
+        r.x += Math.max(0.5, s + (Math.random() * 1.5));
+        r.el.style.left = r.x + 'px';
+        if (r.x >= goalPx) { r.done = true; r.x = goalPx; 終わり.push(r); }
+      });
+      updateUI();
+    }
+
+    function updateUI() {
+      const sorted = [...filteredRobots].sort((a, b) => b.x - a.x);
+      let target = targetId ? robots.find(r => r.id === targetId) : sorted[0];
+
+      if (sorted.length > 0) {
+        document.getElementById('ranks-top').innerHTML = sorted.slice(0, 8).map((b, i) => `
+          <div class="rank-item">
+            <div style="display:flex;align-items:center;">
+              <div style="width:10px;height:10px;background:${b.color};margin-right:5px;border-radius:2px;"></div>
+              ${i + 1}. No.${b.id}
+            </div>
+            <div style="color:#689f38;font-weight:bold;">${Math.floor(b.x / 10)}m</div>
+          </div>`).join('');
+        const last = sorted[sorted.length - 1];
+        document.getElementById('rank-last-area').innerHTML = `
+          <div class="rank-item" style="color:#ff7043;">
+            <div style="display:flex;align-items:center;">
+              <div style="width:10px;height:10px;background:${last.color};margin-right:5px;border-radius:2px;"></div>
+              最下位. No.${last.id}
+            </div>
+            <div style="font-weight:bold;">${Math.floor(last.x / 10)}m</div>
+          </div>`;
+      }
+
+      robots.forEach(r => r.el.classList.remove('target-bot'));
+      document.querySelectorAll('.bot-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('auto-btn').style.background = targetId === null ? "#ff8a65" : "#81d4fa";
+
+      if (target) {
+        target.el.classList.add('target-bot');
+        const ab = document.getElementById('btn-' + target.id);
+        if (ab) ab.classList.add('active');
+        winEl.scrollLeft = Math.max(0, target.x - (window.innerWidth / 2));
+        document.getElementById('mon-name').innerText = "No." + target.id;
+        document.getElementById('mon-name').style.color = target.color;
+        document.getElementById('mon-type-tag').innerText = "タイプ：" + PERSONALITIES[target.type].name;
+        document.getElementById('mon-dist').innerText = Math.floor(target.x / 10);
+        document.getElementById('mon-desc').innerText = PERSONALITIES[target.type].desc;
+        document.getElementById('mon-stat-spd').innerText = target.statSpd;
+        document.getElementById('mon-stat-stm').innerText = target.statStm;
+        document.getElementById('mon-energy').style.width = (target.energy / target.maxEnergy * 100) + "%";
+      }
+
+      updateOddsDisplay();
+      renderTop5();
+      renderBotGrid();
+    }
+
+    // ===================================================
+    // BET
+    // ===================================================
+    let currentBet = null;
+    const minBet = 10;
+    let bettingLocked = false;
+
+    function initBetUI() {
+      const sel = document.getElementById('bet-select');
+      sel.innerHTML = '';
+      for (let i = 1; i <= 100; i++) {
+        sel.insertAdjacentHTML('beforeend', `<option value="${i}">No.${i}</option>`);
+      }
+      document.getElementById('player-balance').innerText = playerBalance;
+      document.getElementById('place-bet').onclick = placeBet;
+      document.getElementById('cancel-bet').onclick = cancelBet;
+      document.getElementById('bet-select').onchange = updateOddsDisplay;
+      document.getElementById('bet-amount').oninput = updateOddsDisplay;
+      updateOddsDisplay();
+    }
+
+    function computeOdds(bot) {
+      const posFactor = 1 + (bot.x / goalPx);
+      const staminaFactor = 0.5 + (bot.energy / bot.maxEnergy) * 1.2;
+      const personalityBonus = {dash:1.15,climb:1.08,lucky:1.05,tough:1.03}[bot.type] || 1.0;
+      const baseScore = bot.baseSpeed * posFactor * staminaFactor * personalityBonus;
+      const total = filteredRobots.reduce((s, r) => {
+        const pf = 1 + (r.x / goalPx);
+        const sf = 0.5 + (r.energy / r.maxEnergy) * 1.2;
+        const pb = {dash:1.15,climb:1.08,lucky:1.05,tough:1.03}[r.type] || 1.0;
+        return s + r.baseSpeed * pf * sf * pb;
+      }, 0.0001);
+      const winProb = Math.max(0.0005, baseScore / total);
+      const oddsDecimal = Math.max(1.1, Math.round((1 / winProb) * 10) / 10);
+      return { oddsDecimal, winProb };
+    }
+
+    function updateOddsDisplay() {
+      const id = parseInt(document.getElementById('bet-select').value, 10);
+      const bot = robots.find(r => r.id === id);
+      if (!bot) { document.getElementById('bet-odds').innerText = '-'; return; }
+      const { oddsDecimal, winProb } = computeOdds(bot);
+      document.getElementById('bet-odds').innerText = oddsDecimal + 'x (' + Math.round(winProb * 10000) / 100 + '%)';
+    }
+
+    function placeBet() {
+      if (bettingLocked) { showBetMsg('レース中は賭けられません'); return; }
+      const amount = Math.floor(Number(document.getElementById('bet-amount').value) || 0);
+      if (isNaN(amount) || amount < minBet) { showBetMsg(`最少賭け金は ${minBet} 円です`); return; }
+      if (amount > playerBalance) { showBetMsg('残高不足です'); return; }
+      const id = parseInt(document.getElementById('bet-select').value, 10);
+      const bot = robots.find(r => r.id === id);
+      if (!bot) { showBetMsg('ロボットが見つかりません'); return; }
+      const { oddsDecimal, winProb } = computeOdds(bot);
+      currentBet = { botId: id, amount, odds: oddsDecimal, prob: winProb };
+      playerBalance -= amount;
+      document.getElementById('player-balance').innerText = playerBalance;
+      saveData();
+      showBetMsg(`No.${id} に ${amount}円 賭けました（${oddsDecimal}x）`);
+    }
+
+    function cancelBet() {
+      if (!currentBet) { showBetMsg('賭けはありません'); return; }
+      if (bettingLocked) { showBetMsg('レース中は取り消せません'); return; }
+      playerBalance += currentBet.amount;
+      currentBet = null;
+      document.getElementById('player-balance').innerText = playerBalance;
+      saveData();
+      showBetMsg('賭けを取り消しました');
+    }
+
+    function showBetMsg(msg) {
+      const el = document.getElementById('bet-msg');
+      el.innerText = msg;
+      setTimeout(() => { if (el.innerText === msg) el.innerText = ''; }, 4000);
+    }
+
+    function checkPayoutsOnFinish() {
+      const winner = 終わり[0];
+      if (!winner) return;
+
+      if (currentBet) {
+        stats.totalBets++;
+        const won = currentBet.botId === winner.id;
+        let payout = 0;
+        if (won) {
+          payout = Math.floor(currentBet.amount * currentBet.odds);
+          playerBalance += payout;
+          stats.wins++;
+          stats.totalEarned += payout;
+          showToast(`🎉 的中！ No.${winner.id} が優勝！ +${payout}円`);
+          showBetMsg(`的中！配当 ${payout}円 獲得！`);
+        } else {
+          showToast(`😢 外れ… No.${winner.id} が優勝`);
+          showBetMsg(`外れ：No.${winner.id} が勝ちました`);
+        }
+        betHistory.push({ botId: currentBet.botId, amount: currentBet.amount, win: won, payout });
+        if (playerBalance > stats.peakBalance) stats.peakBalance = playerBalance;
+        currentBet = null;
+        document.getElementById('player-balance').innerText = playerBalance;
+        saveData();
+        syncToFirebase();
+      } else {
+        showToast(`🏁 No.${winner.id} が優勝！`);
+      }
+    }
+
+    const lockBetting = () => {
+      bettingLocked = true;
+      document.getElementById('place-bet').disabled = true;
+      document.getElementById('cancel-bet').disabled = true;
+    };
+    const unlockBetting = () => {
+      bettingLocked = false;
+      document.getElementById('place-bet').disabled = false;
+      document.getElementById('cancel-bet').disabled = false;
+    };
+
+    // ===================================================
+    // TOP5
+    // ===================================================
+    function getTop5Candidates() {
+      return filteredRobots.map(r => {
+        const { oddsDecimal, winProb } = computeOdds(r);
+        return { id: r.id, color: r.color, prob: winProb, odds: oddsDecimal, dist: Math.floor(r.x / 10) };
+      }).sort((a, b) => b.prob - a.prob).slice(0, 5);
+    }
+
+    function renderTop5() {
+      document.getElementById('top5-list').innerHTML = getTop5Candidates().map((t, i) => `
+        <div class="top5-item" title="No.${t.id} - オッズ ${t.odds}x">
+          <div style="display:flex;align-items:center;">
+            <div style="width:10px;height:10px;background:${t.color};margin-right:8px;border-radius:2px;"></div>
+            ${i + 1}. No.${t.id}
+            <span class="prob-small">（${t.dist}m）</span>
+          </div>
+          <div style="font-weight:bold;">${Math.round(t.prob * 10000) / 100}%</div>
+        </div>`).join('');
+    }
+
+    // ===================================================
+    // FILTER & GRID
+    // ===================================================
+    function filterRobots() {
+      const ft = document.getElementById('filter-select').value;
+      const sf = document.getElementById('stat-select').value;
+      const sr = parseInt(document.getElementById('stat-range').value, 10);
+      filteredRobots = robots.filter(r => {
+        const typeMatch = !ft || r.type === ft;
+        let statMatch = true;
+        if (sf === 'spd') statMatch = r.baseSpeed >= (3 + (sr / 100) * 5);
+        else if (sf === 'stm') statMatch = r.maxEnergy >= (700 + (sr / 100) * 1000);
+        return typeMatch && statMatch;
+      });
+      updateUI();
+    }
+
+    function renderBotGrid() {
+      grid.innerHTML = '';
+      filteredRobots.forEach(r => {
+        const btn = document.createElement('button');
+        btn.className = 'bot-btn' + (targetId === r.id ? ' active' : '');
+        btn.innerText = r.id;
+        btn.style.background = r.color;
+        btn.id = 'btn-' + r.id;
+        btn.onclick = () => { targetId = r.id; updateUI(); };
+        grid.appendChild(btn);
+      });
+    }
+
+    // ===================================================
+    // START / RESET
+    // ===================================================
+    function start() {
+      if (!timer) {
+        lockBetting();
+        document.getElementById('start-controls').style.display = 'none';
+        timer = setInterval(stepAndCheckFinish, 40);
+      }
+    }
+
+    function resetRace() {
+      if (timer) clearInterval(timer);
+      timer = null;
+      unlockBetting();
+      currentBet = null;
+      document.getElementById('bet-msg').innerText = '';
+      initRace();
+    }
+
+    function stepAndCheckFinish() {
+      update();
+      if (終わり.length > 0) {
+        clearInterval(timer);
+        timer = null;
+        checkPayoutsOnFinish();
+        setTimeout(unlockBetting, 1000);
+      }
+    }
+
+    // ===================================================
+    // APP INIT
+    // ===================================================
+    function appInit() {
+      loadData();
+      initRace();
+      // ESCキーでモーダル閉じる
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+        }
+      });
+      // モーダル背景クリックで閉じる
+      document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+      });
+    }
+
+    // グローバルに公開
+    window.filterRobots = filterRobots;
+    window.start = start;
+    window.resetRace = resetRace;
+    window.openProfile = openProfile;
+    window.saveProfile = saveProfile;
+    window.openRanking = openRanking;
+    window.switchTab = switchTab;
+    window.closeModal = closeModal;
+  </script>
+</body>
+</html>
