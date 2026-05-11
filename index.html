@@ -562,6 +562,7 @@
   <div id="side-buttons">
     <button id="profile-btn" onclick="openProfile()">👤 プロフィール</button>
     <button id="ranking-btn" onclick="openRanking()">🏆 ランキング</button>
+    <button id="rules-btn" onclick="openRules()" style="background:rgba(255,255,255,0.97);border:2px solid #81d4fa;border-radius:10px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold;color:#0288d1;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background 0.2s;">📖 る～るせつめい</button>
   </div>
 
   <!-- レース画面 -->
@@ -580,7 +581,7 @@
 
     <label class="bet-field-label" for="bet-amount">賭け金</label>
     <div class="bet-input-row">
-      <input id="bet-amount" type="number" min="1" value="100" class="bet-input-full" />
+      <input id="bet-amount" type="number" min="30" value="100" class="bet-input-full" />
       <span class="bet-unit">円</span>
     </div>
 
@@ -596,7 +597,10 @@
     <div id="bet-msg"></div>
 
     <div id="top5">
-      <div style="font-weight:bold; margin-bottom:3px; font-size:12px;">勝ちやすい子（上位5）</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <div style="font-weight:bold;font-size:12px;">勝ちやすい子（上位5）</div>
+        <button onclick="setBeginnerPick()" style="font-size:11px;padding:3px 8px;border-radius:8px;border:2px solid #aed581;background:#f1f8e9;color:#388e3c;font-weight:bold;cursor:pointer;">🌱 初心者おすすめ</button>
+      </div>
       <div id="top5-list"></div>
     </div>
   </div>
@@ -670,7 +674,7 @@
       </div>
       <div style="margin-bottom:10px;">
         <label style="font-size:13px;font-weight:bold;color:#555;">賭け金（円）</label>
-        <input id="prerace-bet-amount" type="number" min="1" value="100" oninput="updatePreRaceOdds()"
+        <input id="prerace-bet-amount" type="number" min="30" value="100" oninput="updatePreRaceOdds()"
           style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;" />
       </div>
       <div style="background:#f9f9f9;border-radius:12px;padding:10px;margin-bottom:14px;font-size:13px;">
@@ -816,6 +820,79 @@
       </div>
       <div id="op-edit-btn-wrap" style="display:none;margin-top:12px;">
         <button onclick="closeModal('other-profile-modal'); openProfile();" style="width:100%;padding:10px;background:#81d4fa;color:white;border:none;border-radius:12px;font-size:14px;font-weight:bold;cursor:pointer;">✏️ 自分のプロフィールを編集する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RULES MODAL ===== -->
+  <div class="modal-overlay" id="rules-modal">
+    <div class="modal-box" style="width:460px;">
+      <div class="modal-title">
+        <span>📖 る～るせつめい</span>
+        <button class="close-btn" onclick="closeModal('rules-modal')">✕</button>
+      </div>
+
+      <div style="font-size:14px;line-height:1.8;color:#444;">
+
+        <div style="background:#e1f5fe;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#0288d1;margin-bottom:6px;">🏁 レースについて</div>
+          <p style="margin:0 0 6px;">100体のロボットがゴール（1500m）をめざして走ります。いちばんはやくゴールしたロボットが優勝！</p>
+          <p style="margin:0;">「みんなで出発！」ボタンを押すとスタートします。</p>
+        </div>
+
+        <div style="background:#f1f8e9;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#388e3c;margin-bottom:6px;">🎰 賭けのやり方</div>
+          <ol style="margin:0;padding-left:18px;">
+            <li style="margin-bottom:5px;">右上の「レース賭け」パネルで、応援したいロボットを選ぶ</li>
+            <li style="margin-bottom:5px;">賭け金を入力する（最低 <strong>30円</strong> から）</li>
+            <li style="margin-bottom:5px;">「賭ける」ボタンを押す</li>
+            <li>「みんなで出発！」でレース開始！</li>
+          </ol>
+          <div style="margin-top:8px;background:#fff9c4;border-radius:8px;padding:8px;font-size:13px;">
+            ✅ 選んだロボットが1位ならお金がもらえる！<br>
+            ❌ 外れたら賭け金はなくなるよ。
+          </div>
+        </div>
+
+        <div style="background:#fff3e0;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#ef6c00;margin-bottom:6px;">📊 オッズとは？</div>
+          <p style="margin:0 0 6px;">オッズは「賭け金が何倍になって返ってくるか」の数字です。</p>
+          <p style="margin:0 0 6px;">例：<strong>100円を2.5xに賭けて当たると → 250円もらえる！</strong></p>
+          <p style="margin:0;font-size:13px;color:#888;">強そうなロボットはオッズが低く、弱そうなロボットはオッズが高くなります。</p>
+        </div>
+
+        <div style="background:#fce4ec;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#c2185b;margin-bottom:8px;">🤖 ロボットのタイプ</div>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <tr style="background:#f8bbd0;"><th style="padding:5px 8px;text-align:left;border-radius:4px;">タイプ</th><th style="padding:5px 8px;text-align:left;">とくちょう</th></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">⚡ だっしゅ</td><td style="padding:4px 8px;">最初がとても速い。後半はばてやすい</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🐢 のんびり</td><td style="padding:4px 8px;">ゆっくりだが疲れにくい。安定型</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">🔥 しあげ</td><td style="padding:4px 8px;">ゴール直前で爆発的に加速する</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🎲 きまぐれ</td><td style="padding:4px 8px;">走ったり止まったり予測不能</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">🌀 わーぷ</td><td style="padding:4px 8px;">たまに突然前にワープする</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">💪 ねばり</td><td style="padding:4px 8px;">疲れてもペースを落とさず走り続ける</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">🎉 おまつり</td><td style="padding:4px 8px;">近くにロボットが多いほど速くなる</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🍀 らっきー</td><td style="padding:4px 8px;">たまに超高速になるラッキータイムあり</td></tr>
+          </table>
+        </div>
+
+        <div style="background:#f3e5f5;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#7b1fa2;margin-bottom:6px;">🌱 初心者おすすめ機能</div>
+          <p style="margin:0 0 4px;">「勝ちやすい子（上位5）」パネルの <strong>🌱 初心者おすすめ</strong> ボタンを押すと…</p>
+          <ul style="margin:4px 0 0;padding-left:18px;font-size:13px;">
+            <li>速さ★4以上・スタミナ★3以上の安定したロボット</li>
+            <li>タイプ「きまぐれ」の中で勝率が最も高いロボット</li>
+          </ul>
+          <p style="margin:6px 0 0;font-size:13px;color:#888;">を自動で選んでくれます！</p>
+        </div>
+
+        <div style="background:#e8f5e9;border-radius:12px;padding:12px 14px;">
+          <div style="font-weight:bold;font-size:15px;color:#2e7d32;margin-bottom:6px;">💰 残高について</div>
+          <p style="margin:0 0 4px;">最初の残高は <strong>1,000円</strong> です。</p>
+          <p style="margin:0 0 4px;">賭けに勝つとオッズ分だけ増え、負けると賭け金がなくなります。</p>
+          <p style="margin:0;font-size:13px;color:#888;">残高が足りなくなったらプロフィール画面でリセットできます。</p>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1289,7 +1366,7 @@
     function placeBet() {
       if (bettingLocked) { showBetMsg('レース中は賭けられません'); return; }
       const amount = Math.floor(Number(document.getElementById('bet-amount').value) || 0);
-      if (isNaN(amount) || amount < 1) { showBetMsg('1円以上で賭けてください'); return; }
+      if (isNaN(amount) || amount < 30) { showBetMsg('30円以上で賭けてください'); return; }
       if (amount > playerBalance) { showBetMsg('残高不足です'); return; }
       const id = parseInt(document.getElementById('bet-select').value, 10);
       const bot = robots.find(r => r.id === id);
@@ -1462,7 +1539,7 @@
     function startWithBet(doBet) {
       if (doBet) {
         const amount = Math.floor(Number(document.getElementById('prerace-bet-amount').value) || 0);
-        if (amount < 1) { document.getElementById('prerace-msg').innerText = '1円以上で賭けてください'; return; }
+        if (amount < 30) { document.getElementById('prerace-msg').innerText = '30円以上で賭けてください'; return; }
         if (amount > playerBalance) { document.getElementById('prerace-msg').innerText = '残高が足りません'; return; }
         const id = parseInt(document.getElementById('prerace-bet-select').value, 10);
         const bot = robots.find(r => r.id === id);
@@ -1481,7 +1558,30 @@
       timer = setInterval(stepAndCheckFinish, 40);
     }
 
-    function resetBalance() {
+    function setBeginnerPick() {
+      // 速さ4以上、スタミナ3以上、タイプ:きまぐれ の中で勝率最高のロボを選ぶ
+      const candidates = robots.filter(r =>
+        r.baseSpeed >= 4 &&
+        r.maxEnergy >= (700 + (3/5) * 1000) &&
+        r.type === 'random'
+      );
+      if (candidates.length === 0) { showBetMsg('条件に合うロボットがいません'); return; }
+      const best = candidates.map(r => {
+        const { winProb } = computeOdds(r);
+        return { r, winProb };
+      }).sort((a, b) => b.winProb - a.winProb)[0].r;
+      document.getElementById('bet-select').value = best.id;
+      targetId = best.id;
+      updateOddsDisplay();
+      updateUI();
+      showBetMsg(`🌱 おすすめ: No.${best.id}（きまぐれ）をセットしました！`);
+    }
+    window.setBeginnerPick = setBeginnerPick;
+
+    function openRules() {
+      document.getElementById('rules-modal').classList.add('open');
+    }
+    window.openRules = openRules;
       if (!confirm('残高を1000円にリセットしますか？')) return;
       playerBalance = 1000;
       stats.peakBalance = 1000;
