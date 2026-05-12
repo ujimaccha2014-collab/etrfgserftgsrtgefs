@@ -1073,14 +1073,17 @@
         <button class="close-btn" onclick="closeModal('rules-modal')">✕</button>
       </div>
 
-      <div style="font-size:14px;line-height:1.8;color:#444;">
+      <div style="font-size:14px;line-height:1.8;color:#444;max-height:70vh;overflow-y:auto;padding-right:4px;">
 
+        <!-- レースについて -->
         <div style="background:#e1f5fe;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#0288d1;margin-bottom:6px;">🏁 レースについて</div>
           <p style="margin:0 0 6px;">100体のロボットがゴール（1500m）をめざして走ります。いちばんはやくゴールしたロボットが優勝！</p>
-          <p style="margin:0;">「みんなで出発！」ボタンを押すとスタートします。</p>
+          <p style="margin:0 0 4px;">「みんなで出発！」ボタンを押すとスタートします。</p>
+          <p style="margin:0;font-size:13px;color:#0277bd;">レース中は左下のステータスモニターで選択中ロボットの動きを確認できます。</p>
         </div>
 
+        <!-- 賭けのやり方 -->
         <div style="background:#f1f8e9;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#388e3c;margin-bottom:6px;">🎰 賭けのやり方</div>
           <ol style="margin:0;padding-left:18px;">
@@ -1091,47 +1094,102 @@
           </ol>
           <div style="margin-top:8px;background:#fff9c4;border-radius:8px;padding:8px;font-size:13px;">
             ✅ 選んだロボットが1位ならお金がもらえる！<br>
-            ❌ 外れたら賭け金はなくなるよ。
+            ❌ 外れたら賭け金はなくなるよ。<br>
+            💡 賭けなくてもレースは見られます。
           </div>
         </div>
 
+        <!-- オッズ -->
         <div style="background:#fff3e0;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#ef6c00;margin-bottom:6px;">📊 オッズとは？</div>
           <p style="margin:0 0 6px;">オッズは「賭け金が何倍になって返ってくるか」の数字です。</p>
           <p style="margin:0 0 6px;">例：<strong>100円を2.5xに賭けて当たると → 250円もらえる！</strong></p>
-          <p style="margin:0;font-size:13px;color:#888;">強そうなロボットはオッズが低く、弱そうなロボットはオッズが高くなります。</p>
+          <p style="margin:0 0 4px;font-size:13px;color:#888;">強そうなロボット（速さ・スタミナが高い）はオッズが低くなります。</p>
+          <p style="margin:0;font-size:13px;color:#888;">弱そうなロボットは低オッズで当てにくいけど、当たったときのリターンが大きい！</p>
         </div>
 
+        <!-- ロボットのステータス -->
+        <div style="background:#fce4ec;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#c2185b;margin-bottom:6px;">⭐ ロボットのステータス</div>
+          <p style="margin:0 0 8px;font-size:13px;">各ロボットには <strong>速さ</strong> と <strong>スタミナ</strong> があります。</p>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;">
+            <tr style="background:#f8bbd0;"><th style="padding:5px 8px;text-align:left;">ステータス</th><th style="padding:5px 8px;text-align:left;">意味</th></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:5px 8px;">基本の走るはやさ。★が多いほどぐんぐん進む</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">💪 スタミナ</td><td style="padding:5px 8px;">エネルギーの多さ。★が多いほど後半もバテにくい</td></tr>
+          </table>
+          <div style="font-size:13px;background:#fff;border-radius:8px;padding:8px;border:1px solid #f8bbd0;">
+            ★☆☆☆☆ → 最弱　　★★★☆☆ → 中くらい　　★★★★★ → 最強<br>
+            <span style="color:#e53935;font-weight:bold;">赤い★</span> はレアな超強力ステータス！（★5を超えた証）
+          </div>
+        </div>
+
+        <!-- ロボットのタイプ -->
         <div style="background:#fce4ec;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#c2185b;margin-bottom:8px;">🤖 ロボットのタイプ</div>
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
-            <tr style="background:#f8bbd0;"><th style="padding:5px 8px;text-align:left;border-radius:4px;">タイプ</th><th style="padding:5px 8px;text-align:left;">とくちょう</th></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">⚡ だっしゅ</td><td style="padding:4px 8px;">最初がとても速い。後半はばてやすい</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🐢 のんびり</td><td style="padding:4px 8px;">ゆっくりだが疲れにくい。安定型</td></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">🔥 しあげ</td><td style="padding:4px 8px;">ゴール直前で爆発的に加速する</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🎲 きまぐれ</td><td style="padding:4px 8px;">走ったり止まったり予測不能</td></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">🌀 わーぷ</td><td style="padding:4px 8px;">たまに突然前にワープする</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">💪 ねばり</td><td style="padding:4px 8px;">疲れてもペースを落とさず走り続ける</td></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">🎉 おまつり</td><td style="padding:4px 8px;">近くにロボットが多いほど速くなる</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🍀 らっきー</td><td style="padding:4px 8px;">たまに超高速になるラッキータイムあり</td></tr>
+            <tr style="background:#f8bbd0;"><th style="padding:5px 8px;text-align:left;">タイプ</th><th style="padding:5px 8px;text-align:left;">とくちょう</th></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">⚡ だっしゅ</td><td style="padding:5px 8px;">最初がとても速い。後半はバテやすいので早めに差が開く展開が得意</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🐢 のんびり</td><td style="padding:5px 8px;">序盤はゆっくりだが疲れにくい。長距離で安定して上位に来やすい</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">🔥 しあげ</td><td style="padding:5px 8px;">ゴール直前で爆発的に加速！中盤は遅くても逆転優勝がある</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🎲 きまぐれ</td><td style="padding:5px 8px;">走ったり止まったり完全に予測不能。大穴狙いにどうぞ</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">🌀 わーぷ</td><td style="padding:5px 8px;">たまに突然前へワープ！発動すれば一気に順位が上がる</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">💪 ねばり</td><td style="padding:5px 8px;">エネルギーが減っても速度が落ちにくい。後半に強い安定型</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">🎉 おまつり</td><td style="padding:5px 8px;">近くにロボットが多いほど速くなる。序盤の密集地帯で輝く</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🍀 らっきー</td><td style="padding:5px 8px;">たまに超高速のラッキータイム発動！運が良ければ逆転も</td></tr>
           </table>
         </div>
 
+        <!-- ペット -->
         <div style="background:#f3e5f5;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-          <div style="font-weight:bold;font-size:15px;color:#7b1fa2;margin-bottom:6px;">🌱 初心者おすすめ機能</div>
+          <div style="font-weight:bold;font-size:15px;color:#7b1fa2;margin-bottom:8px;">🐾 ペットについて</div>
+          <p style="margin:0 0 8px;font-size:13px;">残高が貯まったら、自分だけのペットロボットを作れます！ペットをレースに参加させると特別なオッズで勝負できます。</p>
+
+          <div style="font-weight:bold;font-size:13px;color:#6a1b9a;margin-bottom:4px;">📋 ペットの作り方</div>
+          <ol style="margin:0 0 10px;padding-left:18px;font-size:13px;">
+            <li style="margin-bottom:4px;">「🐾 ペット」ボタンからペット画面を開く</li>
+            <li style="margin-bottom:4px;">「＋ 作成」ボタンを押してエディターを開く</li>
+            <li style="margin-bottom:4px;">名前・タイプ・ステータス・色を設定して購入</li>
+            <li>作ったペットを選んで「🎰 このペットで賭ける」！</li>
+          </ol>
+
+          <div style="font-weight:bold;font-size:13px;color:#6a1b9a;margin-bottom:6px;">💰 ペット作成コスト</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;">
+            <tr style="background:#e1bee7;"><th style="padding:4px 8px;text-align:left;">項目</th><th style="padding:4px 8px;text-align:left;">コスト</th><th style="padding:4px 8px;text-align:left;">説明</th></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">基本料金</td><td style="padding:4px 8px;">100京円</td><td style="padding:4px 8px;">作成するだけでかかる固定費</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:4px 8px;">+15京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに15京円追加</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">💪 スタミナ</td><td style="padding:4px 8px;">+15京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに15京円追加</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🎯 オッズ倍率</td><td style="padding:4px 8px;">+1000京円/段階</td><td style="padding:4px 8px;">当たったときの配当倍率を上げる</td></tr>
+          </table>
+          <div style="font-size:12px;background:#f3e5f5;border-radius:8px;padding:8px;border:1px solid #ce93d8;margin-bottom:8px;">
+            <strong>タイプ別コスト：</strong><br>
+            🐢 のんびり: 50京　⚡ だっしゅ: 75京　🍀 らっきー: 75京　🎉 おまつり: 75京<br>
+            🔥 しあげ: 100京　💪 ねばり: 125京　🌀 わーぷ: 250京　🎲 きまぐれ: 500京
+          </div>
+
+          <div style="font-weight:bold;font-size:13px;color:#6a1b9a;margin-bottom:4px;">🏁 ペットレースの使い方</div>
+          <p style="margin:0 0 4px;font-size:13px;">ペットで賭けると参加費 <strong>10京円</strong> がかかります。</p>
+          <p style="margin:0 0 4px;font-size:13px;">ペットの <strong>オッズ倍率</strong> が通常のオッズにかけ算されるので、強いペットほど当たったときのリターンが大きくなります！</p>
+          <p style="margin:0;font-size:12px;color:#888;">🌐「みんなのペット」でほかのプレイヤーのペットを見ることもできます。</p>
+        </div>
+
+        <!-- 初心者おすすめ -->
+        <div style="background:#e8eaf6;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#3949ab;margin-bottom:6px;">🌱 初心者おすすめ機能</div>
           <p style="margin:0 0 4px;">「勝ちやすい子（上位5）」パネルの <strong>🌱 初心者おすすめ</strong> ボタンを押すと…</p>
           <ul style="margin:4px 0 0;padding-left:18px;font-size:13px;">
             <li>速さ★4以上・スタミナ★3以上の安定したロボット</li>
             <li>タイプ「きまぐれ」の中で勝率が最も高いロボット</li>
           </ul>
-          <p style="margin:6px 0 0;font-size:13px;color:#888;">を自動で選んでくれます！</p>
+          <p style="margin:6px 0 0;font-size:13px;color:#888;">を自動で選んでくれます！迷ったらまずこれ！</p>
         </div>
 
+        <!-- 残高 -->
         <div style="background:#e8f5e9;border-radius:12px;padding:12px 14px;">
           <div style="font-weight:bold;font-size:15px;color:#2e7d32;margin-bottom:6px;">💰 残高について</div>
           <p style="margin:0 0 4px;">最初の残高は <strong>1,000円</strong> です。</p>
           <p style="margin:0 0 4px;">賭けに勝つとオッズ分だけ増え、負けると賭け金がなくなります。</p>
-          <p style="margin:0;font-size:13px;color:#888;">残高が足りなくなったらプロフィール画面でリセットできます。</p>
+          <p style="margin:0 0 4px;font-size:13px;">残高が足りなくなったらプロフィール画面でリセットできます。</p>
+          <p style="margin:0;font-size:13px;color:#888;">💡 ランキングはプロフィールタブで確認！上位を目指そう！</p>
         </div>
 
       </div>
@@ -1391,14 +1449,28 @@
         { v: 1e8,  s: '億' },
         { v: 1e4,  s: '万' },
       ];
+      // 科学的記数法を展開してカンマ区切りに変換
+      function fullNum(n) {
+        const str = n.toString();
+        if (!str.includes('e')) return str.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const [mantissa, exp] = str.split('e');
+        const expNum = parseInt(exp);
+        const [intPart, decPart = ''] = mantissa.split('.');
+        const digits = intPart + decPart;
+        const dotPos = intPart.length + expNum;
+        const result = dotPos >= digits.length
+          ? digits + '0'.repeat(dotPos - digits.length)
+          : digits.slice(0, dotPos) + '.' + digits.slice(dotPos);
+        return result.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
       if (n < 10000) return n.toLocaleString();
       for (const u of units) {
         if (n >= u.v) {
           const top = Math.floor(n / u.v * 10) / 10;
-          return top + u.s + '(' + n.toLocaleString() + ')';
+          return top + u.s + '（' + fullNum(n) + '）';
         }
       }
-      return n.toLocaleString();
+      return fullNum(n);
     }
 
     // チート対策：簡易ハッシュ（XOR + 素数乗算）
