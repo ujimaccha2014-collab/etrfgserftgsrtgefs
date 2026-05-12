@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理コンソール – ロボレース</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #141720;
+      --surface2:  #1c2030;
+      --border:    #252a3a;
+      --accent:    #4f8ef7;
+      --accent2:   #7c5af7;
+      --green:     #3dd68c;
+      --red:       #f74f6a;
+      --yellow:    #f7c94f;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --mono:      'JetBrains Mono', monospace;
+      --sans:      'Noto Sans JP', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header .logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+    header .logo span { color: var(--muted); font-weight: 400; }
+    #fb-status-badge {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    #fb-status-badge.ok  { color: var(--green); border-color: var(--green); }
+    #fb-status-badge.err { color: var(--red);   border-color: var(--red); }
+
+    /* ===== LAYOUT ===== */
+    main {
+      flex: 1;
+      padding: 28px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ===== SECTION TITLE ===== */
+    .section-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+    }
+
+    /* ===== STATS ROW ===== */
+    #stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .stat-card .label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+    .stat-card .value { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); }
+    .stat-card .value.green { color: var(--green); }
+    .stat-card .value.red   { color: var(--red); }
+    .stat-card .value.yellow{ color: var(--yellow); }
+
+    /* ===== SEARCH BAR ===== */
+    .search-wrap {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .search-wrap input {
+      flex: 1;
+      min-width: 200px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      white-space: nowrap;
+    }
+    .btn:hover  { opacity: .85; }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--accent);  color: #fff; }
+    .btn-danger  { background: var(--red);     color: #fff; }
+    .btn-success { background: var(--green);   color: #0d0f14; }
+    .btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn:disabled { opacity: .35; cursor: not-allowed; }
+
+    /* ===== USER TABLE ===== */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .12s;
+      cursor: pointer;
+    }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 10px 12px; vertical-align: middle; }
+    .uid-cell {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      max-width: 130px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .name-cell { font-weight: 700; }
+    .balance-cell { font-family: var(--mono); color: var(--green); }
+    .ban-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .ban-badge.active  { background: rgba(247,79,106,.18); color: var(--red); border: 1px solid var(--red); }
+    .ban-badge.expired { background: rgba(100,116,139,.15); color: var(--muted); border: 1px solid var(--border); }
+    .ban-badge.none    { background: rgba(61,214,140,.12); color: var(--green); border: 1px solid var(--green); }
+    .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+    #no-results {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    /* ===== MODAL ===== */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.65);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+      animation: modal-in .18s ease;
+    }
+    @keyframes modal-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .modal-close {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .modal-close:hover { background: var(--border); color: var(--text); }
+
+    .field-label {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      margin-top: 14px;
+    }
+    .field-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .field-input:focus { border-color: var(--accent); }
+    .field-input::placeholder { color: var(--muted); }
+    select.field-input {
+      appearance: auto;
+      cursor: pointer;
+    }
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 22px;
+      justify-content: flex-end;
+    }
+    .field-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* ===== USER DETAIL PANEL ===== */
+    #detail-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 14px;
+      padding: 20px 24px;
+      position: relative;
+    }
+    #detail-panel.open { display: block; }
+    #detail-panel .dp-name {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    #detail-panel .dp-uid {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      word-break: break-all;
+    }
+    .dp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .dp-item { background: var(--surface2); border-radius: 8px; padding: 10px 12px; }
+    .dp-item .k { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+    .dp-item .v { font-family: var(--mono); font-size: 14px; font-weight: 600; }
+    .dp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    #detail-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 28px; height: 28px;
+      cursor: pointer; color: var(--muted);
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #detail-close:hover { color: var(--text); background: var(--border); }
+
+    /* ===== TOAST ===== */
+    #admin-toast {
+      position: fixed;
+      bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-family: var(--mono);
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
+      pointer-events: none;
+      z-index: 999;
+      white-space: nowrap;
+    }
+    #admin-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #admin-toast.success { border-color: var(--green); color: var(--green); }
+    #admin-toast.error   { border-color: var(--red);   color: var(--red); }
+
+    /* ===== LOADING ===== */
+    .loading-row td {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .spin {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* スクロールバー */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ROBORACE <span>/ admin</span></div>
+  <button class="btn btn-ghost btn-sm" onclick="loadAllUsers()" id="refresh-btn">↻ 再読み込み</button>
+  <div id="fb-status-badge">Firebase: 初期化中...</div>
+</header>
+
+<main>
+
+  <!-- 統計 -->
+  <div>
+    <div class="section-title">概要</div>
+    <div id="stats-row">
+      <div class="stat-card"><div class="label">総ユーザー数</div><div class="value" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="label">BANユーザー</div><div class="value red" id="stat-banned">—</div></div>
+      <div class="stat-card"><div class="label">最高残高</div><div class="value green" id="stat-maxbal">—</div></div>
+      <div class="stat-card"><div class="label">総賭け回数</div><div class="value yellow" id="stat-bets">—</div></div>
+    </div>
+  </div>
+
+  <!-- ユーザー詳細パネル -->
+  <div id="detail-panel">
+    <button id="detail-close" onclick="closeDetail()">✕</button>
+    <div class="dp-name" id="dp-name">—</div>
+    <div class="dp-uid" id="dp-uid">—</div>
+    <div class="dp-grid">
+      <div class="dp-item"><div class="k">残高</div><div class="v green" id="dp-balance">—</div></div>
+      <div class="dp-item"><div class="k">賭け回数</div><div class="v" id="dp-bets">—</div></div>
+      <div class="dp-item"><div class="k">勝利数</div><div class="v" id="dp-wins">—</div></div>
+      <div class="dp-item"><div class="k">勝率</div><div class="v" id="dp-rate">—</div></div>
+      <div class="dp-item"><div class="k">BAN状態</div><div class="v" id="dp-ban">—</div></div>
+      <div class="dp-item"><div class="k">BAN期限</div><div class="v" id="dp-banuntil">—</div></div>
+      <div class="dp-item" style="grid-column:1/-1"><div class="k">BAN理由</div><div class="v" id="dp-banreason" style="font-size:13px;word-break:break-all;">—</div></div>
+    </div>
+    <div class="dp-actions">
+      <button class="btn btn-success btn-sm" onclick="openBalanceModal()">💰 残高変更</button>
+      <button class="btn btn-danger  btn-sm" onclick="openBanModal()">🚫 BAN設定</button>
+      <button class="btn btn-ghost   btn-sm" onclick="openUnbanConfirm()">✅ BAN解除</button>
+    </div>
+  </div>
+
+  <!-- ユーザー一覧 -->
+  <div class="card">
+    <div class="section-title">ユーザー一覧</div>
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="名前 / UID で検索..." oninput="filterUsers()" />
+      <button class="btn btn-primary btn-sm" onclick="loadAllUsers()">読み込む</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>UID</th>
+            <th>名前</th>
+            <th>残高</th>
+            <th>賭け / 勝</th>
+            <th>勝率</th>
+            <th>BAN</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="user-tbody">
+          <tr class="loading-row"><td colspan="7"><span class="spin"></span>読み込み中...</td></tr>
+        </tbody>
+      </table>
+      <div id="no-results" style="display:none;">該当するユーザーが見つかりません</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== 残高変更モーダル ===== -->
+<div class="modal-bg" id="balance-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">💰 残高変更</div>
+      <button class="modal-close" onclick="closeModal('balance-modal')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">対象: <strong id="bm-name" style="color:var(--text);">—</strong></div>
+
+    <!-- BAN中警告 -->
+    <div id="bm-ban-warning" style="display:none;background:rgba(247,79,106,.1);border:1px solid var(--red);border-radius:8px;padding:10px 12px;margin-bottom:4px;font-size:12px;color:var(--red);line-height:1.6;">
+      ⚠️ このユーザーは現在 <strong>BAN中</strong> です。<br>
+      残高を変更しても、BAN解除されるまでゲームにはアクセスできません。
+    </div>
+
+    <div class="field-label">新しい残高（円）</div>
+    <input class="field-input" type="text" id="bm-amount" placeholder="例: 5000" inputmode="numeric" />
+
+    <!-- BAN中でも適用するオプション -->
+    <div id="bm-ban-option" style="display:none;margin-top:12px;">
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--muted);line-height:1.6;">
+        <input type="checkbox" id="bm-apply-on-unban" style="margin-top:2px;accent-color:var(--accent);width:15px;height:15px;flex-shrink:0;" />
+        <span>BAN解除後に自動で反映する<br>
+          <span style="font-size:11px;color:var(--muted);">チェックなし → 今すぐ Firebase に書き込む（BAN中でも適用）</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="field-hint" style="margin-top:10px;">✔ 次回ユーザーがページを読み込んだ際に反映されます。<br>✔ 反映後は自動的に削除されます（二重適用防止）。</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost"   onclick="closeModal('balance-modal')">キャンセル</button>
+      <button class="btn btn-success" onclick="applyBalance()">変更を適用</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BAN設定モーダル ===== -->
+<div class="modal-bg" id="ban-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🚫 BAN設定</div>
+      <button class="modal-close" onclick="closeModal('ban-modal')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">対象: <strong id="bm2-name" style="color:var(--text);">—</strong></div>
+
+    <div class="field-label">BAN理由</div>
+    <input class="field-input" type="text" id="ban-reason-input" placeholder="例: 不正行為、複数アカウント など" />
+
+    <div class="field-label">BAN期間</div>
+    <select class="field-input" id="ban-duration-select" onchange="onBanDurationChange()">
+      <option value="perm">永久BAN</option>
+      <option value="1h">1時間</option>
+      <option value="6h">6時間</option>
+      <option value="24h">24時間</option>
+      <option value="3d">3日間</option>
+      <option value="7d">7日間</option>
+      <option value="30d">30日間</option>
+      <option value="custom">日時を直接指定</option>
+    </select>
+
+    <div id="ban-custom-wrap" style="display:none;">
+      <div class="field-label">BAN解除日時</div>
+      <input class="field-input" type="datetime-local" id="ban-custom-dt" />
+      <div class="field-hint">指定した日時を過ぎると自動的にBANが解除されます。</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ban-modal')">キャンセル</button>
+      <button class="btn btn-danger" onclick="applyBan()">BANを適用</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BAN解除確認モーダル ===== -->
+<div class="modal-bg" id="unban-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✅ BAN解除</div>
+      <button class="modal-close" onclick="closeModal('unban-modal')">✕</button>
+    </div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7;">
+      <strong id="unban-name" style="color:var(--text);"></strong> のBANを解除しますか？<br>
+      <span style="font-size:12px;">Firebase の <code style="color:var(--accent);">admin_overrides/{uid}</code> の banned フラグが削除されます。</span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost"   onclick="closeModal('unban-modal')">キャンセル</button>
+      <button class="btn btn-success" onclick="applyUnban()">解除する</button>
+    </div>
+  </div>
+</div>
+
+<div id="admin-toast"></div>
+
+<!-- ===== Firebase SDK ===== -->
+<script type="module">
+  import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, get, remove, update }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCaZa4hwDEGQ-V3x_37TpEDTnaucSmcmVQ",
+    authDomain: "kakegame.firebaseapp.com",
+    databaseURL: "https://kakegame-default-rtdb.firebaseio.com",
+    projectId: "kakegame",
+    storageBucket: "kakegame.firebasestorage.app",
+    messagingSenderId: "401886347565",
+    appId: "1:401886347565:web:6205101e07c111117cd3a4"
+  };
+
+  let db = null;
+  const badge = document.getElementById('fb-status-badge');
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getDatabase(app);
+    badge.textContent = '● Firebase 接続済み';
+    badge.classList.add('ok');
+  } catch(e) {
+    badge.textContent = '● Firebase 未接続';
+    badge.classList.add('err');
+  }
+
+  // ランキング（全ユーザー）取得
+  window._adminGetRanking = async () => {
+    if (!db) return null;
+    try {
+      const snap = await get(ref(db, 'ranking'));
+      return snap.exists() ? snap.val() : {};
+    } catch(e) { console.error(e); return null; }
+  };
+
+  // admin_overrides 全体取得
+  window._adminGetOverrides = async () => {
+    if (!db) return {};
+    try {
+      const snap = await get(ref(db, 'admin_overrides'));
+      return snap.exists() ? snap.val() : {};
+    } catch(e) { return {}; }
+  };
+
+  // 特定ユーザーの残高を Firebase から直接取得
+  window._adminGetUserBalance = async (uid) => {
+    if (!db) return null;
+    try {
+      const snap = await get(ref(db, 'ranking/' + uid + '/balance'));
+      return snap.exists() ? snap.val() : null;
+    } catch(e) { return null; }
+  };
+
+  // 残高上書きをセット
+  window._adminSetBalance = async (uid, balance) => {
+    if (!db) throw new Error('Firebase未接続');
+    // 精度ズレ防止のため文字列で保存（index.htmlのnumToStrと同じ処理）
+    const balStr = Number.isFinite(balance) ? Math.floor(balance).toString() : String(balance);
+    await update(ref(db, 'admin_overrides/' + uid), { balance: balStr });
+  };
+
+  // BANをセット
+  window._adminSetBan = async (uid, reason, banUntil) => {
+    if (!db) throw new Error('Firebase未接続');
+    const data = { banned: true, banReason: reason };
+    if (banUntil) data.banUntil = banUntil;
+    else          data.banUntil = null;
+    await update(ref(db, 'admin_overrides/' + uid), data);
+  };
+
+  // BAN解除
+  window._adminUnban = async (uid) => {
+    if (!db) throw new Error('Firebase未接続');
+    await update(ref(db, 'admin_overrides/' + uid), {
+      banned: false,
+      banReason: null,
+      banUntil:  null
+    });
+  };
+</script>
+
+<script>
+  let allUsers = [];   // { uid, ...rankingData, ...overrideData }
+  let selectedUid = null;
+
+  // ===== ユーザー読み込み =====
+  async function loadAllUsers() {
+    const btn = document.getElementById('refresh-btn');
+    btn.disabled = true;
+    btn.textContent = '読み込み中...';
+    setTableLoading();
+
+    const [ranking, overrides] = await Promise.all([
+      window._adminGetRanking  ? window._adminGetRanking()  : Promise.resolve(null),
+      window._adminGetOverrides ? window._adminGetOverrides() : Promise.resolve({})
+    ]);
+
+    if (!ranking) {
+      showToast('Firebase取得失敗', 'error');
+      btn.disabled = false; btn.textContent = '↻ 再読み込み';
+      return;
+    }
+
+    allUsers = Object.entries(ranking).map(([uid, d]) => ({
+      uid,
+      name:      d.name      || '名無し',
+      balance:   Number(d.balance) || 0,
+      totalBets: d.totalBets || 0,
+      wins:      d.wins      || 0,
+      winRate:   d.winRate   || 0,
+      spirit:    d.spirit    || '',
+      updatedAt: d.updatedAt || 0,
+      // overrides
+      ov: overrides[uid] || {}
+    }));
+
+    updateStats();
+    renderTable(allUsers);
+    btn.disabled = false; btn.textContent = '↻ 再読み込み';
+  }
+
+  // ===== 統計更新 =====
+  function updateStats() {
+    const now = Date.now();
+    const banned = allUsers.filter(u => {
+      if (!u.ov.banned) return false;
+      const until = u.ov.banUntil ? Number(u.ov.banUntil) : 0;
+      return until === 0 || now < until;
+    }).length;
+    const maxBal = allUsers.reduce((m, u) => Math.max(m, u.balance), 0);
+    const totalBets = allUsers.reduce((s, u) => s + (u.totalBets || 0), 0);
+
+    document.getElementById('stat-total').textContent  = allUsers.length;
+    document.getElementById('stat-banned').textContent = banned;
+    document.getElementById('stat-maxbal').textContent = fmtBal(maxBal);
+    document.getElementById('stat-bets').textContent   = totalBets.toLocaleString();
+  }
+
+  // ===== 簡易残高表示 =====
+  function fmtBal(n) {
+    // 日本語大数単位（万・億・兆・京・垓・𥝱(秭)・穰 ...）
+    if (n >= 1e68) return (n/1e68).toFixed(1) + '無量大数';
+    if (n >= 1e64) return (n/1e64).toFixed(1) + '不可思議';
+    if (n >= 1e60) return (n/1e60).toFixed(1) + '那由他';
+    if (n >= 1e56) return (n/1e56).toFixed(1) + '阿僧祇';
+    if (n >= 1e52) return (n/1e52).toFixed(1) + '恒河沙';
+    if (n >= 1e48) return (n/1e48).toFixed(1) + '極';
+    if (n >= 1e44) return (n/1e44).toFixed(1) + '載';
+    if (n >= 1e40) return (n/1e40).toFixed(1) + '正';
+    if (n >= 1e36) return (n/1e36).toFixed(1) + '澗';
+    if (n >= 1e32) return (n/1e32).toFixed(1) + '溝';
+    if (n >= 1e28) return (n/1e28).toFixed(1) + '穰';
+    if (n >= 1e24) return (n/1e24).toFixed(1) + '𥝱';
+    if (n >= 1e20) return (n/1e20).toFixed(1) + '垓';
+    if (n >= 1e16) return (n/1e16).toFixed(1) + '京';
+    if (n >= 1e12) return (n/1e12).toFixed(1) + '兆';
+    if (n >= 1e8)  return (n/1e8).toFixed(1)  + '億';
+    if (n >= 1e4)  return (n/1e4).toFixed(1)  + '万';
+    return n.toLocaleString();
+  }
+
+  // ===== BAN状態判定 =====
+  function banStatus(u) {
+    if (!u.ov.banned) return { label: '正常', cls: 'none', active: false };
+    const until = u.ov.banUntil ? Number(u.ov.banUntil) : 0;
+    if (until > 0 && Date.now() >= until) return { label: '期限切れ', cls: 'expired', active: false };
+    const label = until ? '期限付き' : '永久BAN';
+    return { label, cls: 'active', active: true };
+  }
+
+  // ===== テーブル描画 =====
+  function renderTable(users) {
+    const tbody = document.getElementById('user-tbody');
+    const noRes = document.getElementById('no-results');
+    if (users.length === 0) {
+      tbody.innerHTML = '';
+      noRes.style.display = 'block';
+      return;
+    }
+    noRes.style.display = 'none';
+    tbody.innerHTML = users.map(u => {
+      const bs = banStatus(u);
+      return `<tr onclick="selectUser('${u.uid}')">
+        <td class="uid-cell" title="${u.uid}">${u.uid}</td>
+        <td class="name-cell">${esc(u.name)}</td>
+        <td class="balance-cell">${fmtBal(u.balance)}</td>
+        <td>${u.totalBets} / ${u.wins}</td>
+        <td>${u.winRate}%</td>
+        <td><span class="ban-badge ${bs.cls}">${bs.label}</span></td>
+        <td class="actions-cell">
+          <button class="btn btn-success btn-sm" onclick="event.stopPropagation();quickBalance('${u.uid}')">💰</button>
+          <button class="btn btn-danger  btn-sm" onclick="event.stopPropagation();quickBan('${u.uid}')">🚫</button>
+          ${bs.active ? `<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();quickUnban('${u.uid}')">✅</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function setTableLoading() {
+    document.getElementById('user-tbody').innerHTML =
+      '<tr class="loading-row"><td colspan="7"><span class="spin"></span>読み込み中...</td></tr>';
+    document.getElementById('no-results').style.display = 'none';
+  }
+
+  // ===== 検索フィルター =====
+  function filterUsers() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    renderTable(q ? allUsers.filter(u => u.name.toLowerCase().includes(q) || u.uid.toLowerCase().includes(q)) : allUsers);
+  }
+
+  // ===== ユーザー選択 =====
+  function selectUser(uid) {
+    selectedUid = uid;
+    const u = allUsers.find(u => u.uid === uid);
+    if (!u) return;
+    const bs = banStatus(u);
+    const until = u.ov.banUntil ? Number(u.ov.banUntil) : 0;
+    const untilStr = until ? new Date(until).toLocaleString('ja-JP') : '—';
+
+    document.getElementById('dp-name').textContent     = u.name;
+    document.getElementById('dp-uid').textContent      = uid;
+    document.getElementById('dp-balance').textContent  = fmtBal(u.balance) + ' 円';
+    document.getElementById('dp-bets').textContent     = u.totalBets + ' 回';
+    document.getElementById('dp-wins').textContent     = u.wins + ' 回';
+    document.getElementById('dp-rate').textContent     = u.winRate + '%';
+    document.getElementById('dp-ban').textContent      = bs.label;
+    document.getElementById('dp-ban').style.color      = bs.active ? 'var(--red)' : 'var(--green)';
+    document.getElementById('dp-banuntil').textContent = untilStr;
+    document.getElementById('dp-banreason').textContent = u.ov.banReason || '—';
+
+    document.getElementById('detail-panel').classList.add('open');
+    document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function closeDetail() {
+    document.getElementById('detail-panel').classList.remove('open');
+    selectedUid = null;
+  }
+
+  // ===== モーダル制御 =====
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // 残高変更モーダル（Firebase から最新残高を取得して表示）
+  async function openBalanceModal() {
+    if (!selectedUid) return;
+    const u = allUsers.find(u => u.uid === selectedUid);
+    document.getElementById('bm-name').textContent = u ? u.name : selectedUid;
+
+    // モーダルを先に開いてローディング表示
+    const amtInput = document.getElementById('bm-amount');
+    amtInput.value = '';
+    amtInput.placeholder = '取得中...';
+    amtInput.disabled = true;
+    document.getElementById('balance-modal').classList.add('open');
+
+    // Firebase から最新の残高を取得
+    const fbBal = typeof window._adminGetUserBalance === 'function'
+      ? await window._adminGetUserBalance(selectedUid)
+      : null;
+
+    amtInput.disabled = false;
+    amtInput.placeholder = '例: 5000';
+    // 取得できればFirebase値、失敗時はキャッシュ値にフォールバック
+    amtInput.value = fbBal !== null ? BigInt(Math.round(fbBal)).toString() : (u ? BigInt(Math.round(u.balance)).toString() : '');
+
+    // BAN中かどうかチェック
+    const bs = u ? banStatus(u) : { active: false };
+    document.getElementById('bm-ban-warning').style.display = bs.active ? 'block' : 'none';
+    document.getElementById('bm-ban-option').style.display  = bs.active ? 'block' : 'none';
+    document.getElementById('bm-apply-on-unban').checked = false;
+  }
+  function quickBalance(uid) { selectedUid = uid; openBalanceModal(); }
+
+  // BAN モーダル
+  function openBanModal() {
+    if (!selectedUid) return;
+    const u = allUsers.find(u => u.uid === selectedUid);
+    document.getElementById('bm2-name').textContent = u ? u.name : selectedUid;
+    document.getElementById('ban-reason-input').value = u?.ov?.banReason || '';
+    document.getElementById('ban-duration-select').value = 'perm';
+    document.getElementById('ban-custom-wrap').style.display = 'none';
+    // datetime-local の初期値を現在+1日に設定
+    const d = new Date(Date.now() + 86400000);
+    document.getElementById('ban-custom-dt').value =
+      d.getFullYear() + '-' +
+      String(d.getMonth()+1).padStart(2,'0') + '-' +
+      String(d.getDate()).padStart(2,'0') + 'T' +
+      String(d.getHours()).padStart(2,'0') + ':' +
+      String(d.getMinutes()).padStart(2,'0');
+    document.getElementById('ban-modal').classList.add('open');
+  }
+  function quickBan(uid) { selectedUid = uid; openBanModal(); }
+
+  function onBanDurationChange() {
+    const v = document.getElementById('ban-duration-select').value;
+    document.getElementById('ban-custom-wrap').style.display = v === 'custom' ? 'block' : 'none';
+  }
+
+  // BAN解除確認
+  function openUnbanConfirm() {
+    if (!selectedUid) return;
+    const u = allUsers.find(u => u.uid === selectedUid);
+    document.getElementById('unban-name').textContent = u ? u.name : selectedUid;
+    document.getElementById('unban-modal').classList.add('open');
+  }
+  function quickUnban(uid) { selectedUid = uid; openUnbanConfirm(); }
+
+  // ===== 残高変更 適用 =====
+  async function applyBalance() {
+    const rawVal = document.getElementById('bm-amount').value.trim();
+    const amount = Number(rawVal);
+    if (!rawVal || isNaN(amount) || amount < 0) { showToast('正しい金額を入力してください', 'error'); return; }
+    if (isNaN(amount) || amount < 0) { showToast('正しい金額を入力してください', 'error'); return; }
+
+    const u = allUsers.find(u => u.uid === selectedUid);
+    const bs = u ? banStatus(u) : { active: false };
+    const applyOnUnban = document.getElementById('bm-apply-on-unban').checked;
+
+    // BAN中 かつ「BAN解除後に反映」チェックあり → balance だけ書いて BAN はそのまま
+    // BAN中 かつチェックなし → 普通に balance を書き込む（BAN中でも次のload時に反映）
+    // BAN中でない → 普通に書き込む
+    // ※ どちらも Firebase の admin_overrides/{uid}/balance に書くだけ。
+    //   「解除後に反映」はユーザー側のチェックAdminOverridesがBAN中はスキップするため
+    //   自然にBAN解除後の初回loadで反映される仕組みを利用している。
+
+    if (bs.active && !applyOnUnban) {
+      // BAN中でも今すぐ適用したい場合: balance を書き込む
+      // ただしユーザー側はBAN画面でロックされるため実質BAN解除されるまで見えない
+      // → 管理者への注意として確認を挟む
+      if (!confirm(`${u?.name ?? selectedUid} は現在BAN中です。\nFirebaseには今すぐ書き込みますが、BAN解除されるまでユーザーには反映されません。\nそれでも書き込みますか？`)) return;
+    }
+
+    try {
+      await window._adminSetBalance(selectedUid, amount);
+      if (u) { u.ov.balance = amount; }
+      closeModal('balance-modal');
+
+      const note = bs.active
+        ? (applyOnUnban ? '（BAN解除後に自動反映）' : '（BAN中・解除後に反映）')
+        : '';
+      showToast(`✔ ${fmtBal(amount)}円 をセットしました ${note}`.trim(), 'success');
+      renderTable(allUsers);
+      updateStats();
+      if (selectedUid) selectUser(selectedUid);
+    } catch(e) {
+      showToast('エラー: ' + e.message, 'error');
+    }
+  }
+
+  // ===== BAN 適用 =====
+  async function applyBan() {
+    const reason = document.getElementById('ban-reason-input').value.trim() || '利用規約違反';
+    const dur    = document.getElementById('ban-duration-select').value;
+    let banUntil = null;
+    const now = Date.now();
+    const durMap = { '1h': 3600000, '6h': 21600000, '24h': 86400000, '3d': 259200000, '7d': 604800000, '30d': 2592000000 };
+    if (dur === 'perm') {
+      banUntil = null;
+    } else if (dur === 'custom') {
+      const dt = document.getElementById('ban-custom-dt').value;
+      if (!dt) { showToast('日時を選択してください', 'error'); return; }
+      banUntil = new Date(dt).getTime();
+      if (banUntil <= now) { showToast('過去の日時は指定できません', 'error'); return; }
+    } else {
+      banUntil = now + durMap[dur];
+    }
+
+    try {
+      await window._adminSetBan(selectedUid, reason, banUntil);
+      const u = allUsers.find(u => u.uid === selectedUid);
+      if (u) { u.ov.banned = true; u.ov.banReason = reason; u.ov.banUntil = banUntil; }
+      closeModal('ban-modal');
+      const label = dur === 'perm' ? '永久BAN' : dur === 'custom' ? '期限付きBAN' : dur + ' BAN';
+      showToast(`🚫 ${label} を適用しました`, 'success');
+      renderTable(allUsers);
+      updateStats();
+      if (selectedUid) selectUser(selectedUid);
+    } catch(e) {
+      showToast('エラー: ' + e.message, 'error');
+    }
+  }
+
+  // ===== BAN解除 適用 =====
+  async function applyUnban() {
+    try {
+      await window._adminUnban(selectedUid);
+      const u = allUsers.find(u => u.uid === selectedUid);
+      if (u) { u.ov.banned = false; u.ov.banReason = null; u.ov.banUntil = null; }
+      closeModal('unban-modal');
+      showToast('✅ BAN解除しました', 'success');
+      renderTable(allUsers);
+      updateStats();
+      if (selectedUid) selectUser(selectedUid);
+    } catch(e) {
+      showToast('エラー: ' + e.message, 'error');
+    }
+  }
+
+  // ===== トースト =====
+  let toastTimer;
+  function showToast(msg, type='') {
+    const t = document.getElementById('admin-toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.className = '', 3000);
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ESCで閉じる
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-bg.open').forEach(m => m.classList.remove('open'));
+    }
+  });
+  document.querySelectorAll('.modal-bg').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  // グローバル公開
+  window.loadAllUsers    = loadAllUsers;
+  window.filterUsers     = filterUsers;
+  window.selectUser      = selectUser;
+  window.closeDetail     = closeDetail;
+  window.closeModal      = closeModal;
+  window.openBalanceModal = openBalanceModal;
+  window.openBanModal    = openBanModal;
+  window.openUnbanConfirm = openUnbanConfirm;
+  window.onBanDurationChange = onBanDurationChange;
+  window.quickBalance    = quickBalance;
+  window.quickBan        = quickBan;
+  window.quickUnban      = quickUnban;
+  window.applyBalance    = applyBalance;
+  window.applyBan        = applyBan;
+  window.applyUnban      = applyUnban;
+
+  // 起動時に自動ロード
+  window.addEventListener('load', () => {
+    setTimeout(loadAllUsers, 600); // Firebase初期化待ち
+  });
+</script>
+</body>
+</html>
