@@ -853,7 +853,7 @@
 
     <div class="bet-info-bar">
       <span>オッズ: <strong id="bet-odds">-</strong></span>
-      <span>残高: <strong><span id="player-balance">1000</span>円</strong></span>
+      <span>💰 現在の所持金: <strong><span id="player-balance">1000</span>円</strong></span>
     </div>
 
     <div style="display:flex; justify-content:space-between; gap:6px; margin-bottom:4px;">
@@ -915,7 +915,7 @@
 
   <!-- コントロールボタン -->
   <div class="controls" id="start-controls">
-    <button class="start-btn" onclick="start()">みんなで出発！</button>
+    <button class="start-btn" onclick="openPreRaceModal()">🏁 出発！</button>
     <button onclick="resetRace()" style="background:none;border:none;color:#999;cursor:pointer;">はじめからやり直す</button>
   </div>
 
@@ -948,9 +948,17 @@
           <span style="color:#888;">オッズ</span>
           <span id="prerace-odds" style="font-weight:bold;color:#ef6c00;">-</span>
         </div>
-        <div style="display:flex;justify-content:space-between;">
-          <span style="color:#888;">残高</span>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:#888;">💰 現在の所持金</span>
           <span id="prerace-balance" style="font-weight:bold;">- 円</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:#888;">🎰 賭け金</span>
+          <span id="prerace-bet-disp" style="font-weight:bold;color:#333;">- 円</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:2px;">
+          <span style="color:#888;">支払い合計（賭けなしの場合0円）</span>
+          <span id="prerace-total-disp" style="font-weight:bold;color:#ef6c00;">- 円</span>
         </div>
       </div>
       <div id="prerace-msg" style="min-height:1.2em;font-size:12px;color:#e57373;margin-bottom:10px;"></div>
@@ -1180,9 +1188,9 @@
           <div style="font-weight:bold;font-size:13px;color:#6a1b9a;margin-bottom:6px;">💰 ペット作成コスト</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;">
             <tr style="background:#e1bee7;"><th style="padding:4px 8px;text-align:left;">項目</th><th style="padding:4px 8px;text-align:left;">コスト</th><th style="padding:4px 8px;text-align:left;">説明</th></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">基本料金</td><td style="padding:4px 8px;">100京円</td><td style="padding:4px 8px;">作成するだけでかかる固定費</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:4px 8px;">+15京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに15京円追加</td></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">💪 スタミナ</td><td style="padding:4px 8px;">+15京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに15京円追加</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">基本料金</td><td style="padding:4px 8px;">500垓円</td><td style="padding:4px 8px;">作成するだけでかかる固定費</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:4px 8px;">+1500京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに1500京円追加</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">💪 スタミナ</td><td style="padding:4px 8px;">+3000京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに3000京円追加</td></tr>
             <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🎯 オッズ倍率</td><td style="padding:4px 8px;">+1000京円/段階</td><td style="padding:4px 8px;">当たったときの配当倍率を上げる</td></tr>
           </table>
           <div style="font-size:12px;background:#f3e5f5;border-radius:8px;padding:8px;border:1px solid #ce93d8;margin-bottom:8px;">
@@ -1269,6 +1277,12 @@
               <button class="pve-add-btn" onclick="pveAddPart('rect')">■ 四角</button>
               <button class="pve-add-btn" onclick="pveAddPart('triangle')">▲ 三角</button>
             </div>
+            <!-- 枠オプション -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;margin-top:2px;">
+              <div class="pve-section-label" style="margin:0;">枠</div>
+              <button id="pve-border-off" onclick="pveBorderSet(false)" style="flex:1;padding:4px 6px;border:2px solid #aed581;border-radius:6px;background:#f1f8e9;font-size:11px;font-weight:bold;color:#388e3c;cursor:pointer;">なし ✓</button>
+              <button id="pve-border-on" onclick="pveBorderSet(true)" style="flex:1;padding:4px 6px;border:2px solid #e0e0e0;border-radius:6px;background:#fff;font-size:11px;font-weight:bold;color:#555;cursor:pointer;">あり</button>
+            </div>
             <!-- 選択中パーツのプロパティ -->
             <div id="pve-props" style="display:none;">
               <div class="pve-section-label" style="margin-top:8px;">選択中パーツ</div>
@@ -1352,7 +1366,7 @@
 
       <!-- 費用内訳 -->
       <div class="pet-cost-box">
-        <div class="pet-cost-row"><span>初期費用</span><span>100京円</span></div>
+        <div class="pet-cost-row"><span>初期費用</span><span>500垓円</span></div>
         <div class="pet-cost-row"><span>タイプ費用</span><span id="pc-type">-</span></div>
         <div class="pet-cost-row"><span>はやさ費用</span><span id="pc-spd">-</span></div>
         <div class="pet-cost-row"><span>スタミナ費用</span><span id="pc-stm">-</span></div>
@@ -2079,7 +2093,7 @@
       if (petRaceBetActive && petRaceBetInfo) {
         const pet = petRaceBetInfo;
         // ペットのスピードをロボに変換してオッズ計算
-        const petSpd = 3 + (pet.spd / 100) * 5;
+        const petSpd = 3 + (pet.spd / 100) * 30;
         const petStmVal = 700 + (pet.stm / 100) * 1000;
         const posFactor = 1;
         const sfVal = 0.5 + 1.2;
@@ -2192,7 +2206,7 @@
         const btn = document.createElement('button');
         btn.className = 'bot-btn' + (targetId === r.id ? ' active' : '');
         if (r.isPet && r.parts && r.parts.length > 0) {
-          btn.innerHTML = renderPetSvg(r.parts, 24);
+          btn.innerHTML = renderPetSvg(r.parts, 24, r.petBorder);
           btn.style.background = 'white';
           btn.style.border = '2px solid ' + r.color;
           btn.style.fontSize = '0';
@@ -2223,16 +2237,16 @@
             document.getElementById('player-balance').innerText = formatMoney(playerBalance);
             saveData();
             const pet = petRaceBetInfo;
-            const petSpd = 3 + (pet.spd / 100) * 5;
+            const petSpd = 3 + (pet.spd / 100) * 30; // スライダー100で最大33（通常最大8の4倍以上）
             const petStm = 700 + (pet.stm / 100) * 1000;
             const petEl = document.createElement('div');
             petEl.className = 'robot';
-            petEl.style.cssText = 'position:absolute;width:42px;height:42px;border-radius:6px;border:3px solid ' + (pet.color || '#ff8a65') + ';display:flex;align-items:center;justify-content:center;overflow:hidden;background:white;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+            petEl.style.cssText = 'position:absolute;width:42px;height:42px;border-radius:6px;border:none;display:flex;align-items:center;justify-content:center;overflow:visible;background:transparent;z-index:10;box-shadow:none;';
             petEl.style.top = Math.random() * (track.offsetHeight - 60) + 10 + 'px';
             petEl.style.left = '0px';
             petEl.title = pet.name;
             if (pet.parts && pet.parts.length > 0) {
-              petEl.innerHTML = renderPetSvg(pet.parts, 36);
+              petEl.innerHTML = renderPetSvg(pet.parts, 36, pet.border);
             } else {
               petEl.style.fontSize = '20px';
               petEl.innerText = '🐾';
@@ -2242,6 +2256,7 @@
               id: 'pet_' + pet.name,
               isPet: true,
               petName: pet.name,
+              petBorder: pet.border || false,
               el: petEl,
               x: 0,
               color: pet.color || '#ff8a65',
@@ -2299,7 +2314,6 @@
       sel.innerHTML = robots.map(r => `<option value="${r.id}">No.${r.id}（${PERSONALITIES[r.type].name}）</option>`).join('');
       sel.onchange = updatePreRaceOdds;
       document.getElementById('prerace-bet-amount').value = 100;
-      document.getElementById('prerace-balance').innerText = formatMoney(playerBalance) + ' 円';
       document.getElementById('prerace-msg').innerText = '';
       updatePreRaceOdds();
       document.getElementById('prerace-modal').classList.add('open');
@@ -2311,6 +2325,10 @@
       if (!bot) { document.getElementById('prerace-odds').innerText = '-'; return; }
       const { oddsDecimal, winProb } = computeOdds(bot);
       document.getElementById('prerace-odds').innerText = `${oddsDecimal}x（勝率 ${Math.round(winProb * 10000) / 100}%）`;
+      const amt = Math.floor(Number(document.getElementById('prerace-bet-amount').value) || 0);
+      document.getElementById('prerace-bet-disp').innerText = formatMoney(amt) + ' 円';
+      document.getElementById('prerace-balance').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('prerace-total-disp').innerText = formatMoney(amt) + ' 円';
     }
 
     function startWithBet(doBet) {
@@ -2384,10 +2402,10 @@
       return html;
     }
     function petCostCalc(type, spd, stm, oddsX) {
-      const init    = 100e15;
+      const init    = 500e20; // 500垓円
       const typeCost = PET_TYPE_COST[type] || 0;
-      const spdCost  = (spd - 1) * 15e15;
-      const stmCost  = (stm - 1) * 15e15;
+      const spdCost  = (spd - 1) * 1500e15; // 1500京/段階
+      const stmCost  = (stm - 1) * 3000e15; // 3000京/段階
       const oddsCost = (oddsX - 1) * 1000e15;
       return { init, typeCost, spdCost, stmCost, oddsCost,
                total: init + typeCost + spdCost + stmCost + oddsCost };
@@ -2407,7 +2425,7 @@
     }
 
 
-    function renderPetSvg(parts, size=48) {
+    function renderPetSvg(parts, size=48, border=false) {
       if (!parts || parts.length === 0) return '<span style="font-size:' + (size*0.6) + 'px;">🐾</span>';
       const scale = size / 200;
       const shapes = parts.map(p => {
@@ -2425,7 +2443,10 @@
         }
         return '<g transform="translate(' + tx + ',' + ty + ') rotate(' + rot + ')">' + shape + '</g>';
       }).join('');
-      return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">' + shapes + '</svg>';
+      const borderCircle = border
+        ? '<circle cx="' + (size/2) + '" cy="' + (size/2) + '" r="' + (size/2 - 2) + '" fill="none" stroke="#81d4fa" stroke-width="' + Math.max(2, size/20) + '"/>'
+        : '';
+      return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">' + shapes + borderCircle + '</svg>';
     }
 
     function renderPetList() {
@@ -2441,7 +2462,7 @@
           card.className = 'pet-card' + (selectedPetIdx === i ? ' selected' : '');
           card.innerHTML = `
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-              <div style="flex-shrink:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;border-radius:8px;overflow:hidden;">${renderPetSvg(p.parts, 48)}</div>
+              <div style="flex-shrink:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;border-radius:8px;overflow:hidden;">${renderPetSvg(p.parts, 48, p.border)}</div>
               <div>
                 <div class="pet-card-name" style="color:${p.color}">${escHtml(p.name)}</div>
                 <div class="pet-card-type">${PERSONALITIES[p.type]?.name || p.type}</div>
@@ -2509,22 +2530,19 @@
 
       document.getElementById('pet-editor-msg').innerText = '';
       updatePetCost();
-      // ビジュアルエディターはペット作成時のみ表示
-      document.getElementById('pve-row').style.display = !isEdit ? '' : 'none';
+      // ビジュアルエディターを常に表示（作成・編集どちらでも）
+      document.getElementById('pve-row').style.display = '';
       document.getElementById('pet-editor').classList.add('open');
-      if (!isEdit) {
-        setTimeout(() => {
-          pveInitEvents();
+      setTimeout(() => {
+        pveInitEvents();
+        if (!isEdit) {
           pveParts = []; pveSelected = -1;
+          pveBorderSet(false);
           pveRefreshUI(); pveDraw();
-        }, 50);
-      } else if (isEdit && selectedPetIdx >= 0) {
-        // 編集モードでもパーツデータは保持
-        setTimeout(() => {
-          pveInitEvents();
+        } else if (isEdit && selectedPetIdx >= 0) {
           pveLoadFromPet(pets[selectedPetIdx]);
-        }, 50);
-      }
+        }
+      }, 50);
     }
 
     function closePetEditor() {
@@ -2549,12 +2567,33 @@
       document.getElementById('pet-spd-stars').innerHTML = petStars(spd);
       document.getElementById('pet-stm-stars').innerHTML = petStars(stm);
 
+      // スライダーが高い（50以上）のとき赤くハイライト
+      const spdRange = document.getElementById('pet-spd-range');
+      const stmRange = document.getElementById('pet-stm-range');
+      spdRange.style.accentColor = spd >= 50 ? '#e53935' : spd >= 20 ? '#f57c00' : '#81c784';
+      stmRange.style.accentColor = stm >= 50 ? '#e53935' : stm >= 20 ? '#f57c00' : '#81c784';
+      document.getElementById('pet-spd-val').style.color = spd >= 50 ? '#e53935' : spd >= 20 ? '#f57c00' : '#333';
+      document.getElementById('pet-stm-val').style.color = stm >= 50 ? '#e53935' : stm >= 20 ? '#f57c00' : '#333';
+
+      document.getElementById('pet-spd-cost-label').innerText = `（＋${formatMoney(c.spdCost)}円）`;
+      document.getElementById('pet-stm-cost-label').innerText = `（＋${formatMoney(c.stmCost)}円）`;
+      document.getElementById('pet-odds-cost-label').innerText = `（＋${formatMoney(c.oddsCost)}円）`;
+      document.getElementById('pet-type-cost-label').innerText = `（${formatMoney(petCostCalc(type,1,1,1).typeCost)}円）`;
+
       document.getElementById('pc-type').innerText  = formatMoney(c.typeCost)  + '円';
       document.getElementById('pc-spd').innerText   = formatMoney(c.spdCost)   + '円';
       document.getElementById('pc-stm').innerText   = formatMoney(c.stmCost)   + '円';
       document.getElementById('pc-odds').innerText  = formatMoney(c.oddsCost)  + '円';
       document.getElementById('pc-total').innerText = formatMoney(c.total)     + '円';
       document.getElementById('pc-balance').innerText = formatMoney(playerBalance);
+
+      // 賭けパネルの支払い表示を更新
+      const betAmountEl = document.getElementById('bet-amount');
+      if (betAmountEl) {
+        const amt = parseInt(betAmountEl.value) || 0;
+        const betLabelEl = document.getElementById('bet-total-label');
+        if (betLabelEl) betLabelEl.innerText = formatMoney(amt);
+      }
 
       const canAfford = playerBalance >= c.total;
       document.getElementById('pet-confirm-btn').disabled = !canAfford;
@@ -2586,7 +2625,7 @@
       if (petEditorMode === 'create') {
         if (playerBalance < c.total) { document.getElementById('pet-editor-msg').innerText = '残高が足りません'; return; }
         playerBalance -= c.total;
-        pets.push({ name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)) });
+        pets.push({ name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)), border: pveBorderEnabled });
         showToast(`🐾 ${name} を作成しました！`);
       } else {
         const oldP = pets[selectedPetIdx];
@@ -2594,7 +2633,7 @@
         const diff = c.total - oldC.total;
         if (diff > 0 && playerBalance < diff) { document.getElementById('pet-editor-msg').innerText = '追加費用が足りません'; return; }
         playerBalance -= diff;
-        pets[selectedPetIdx] = { name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)) };
+        pets[selectedPetIdx] = { name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)), border: pveBorderEnabled };
         showToast(`✏️ ${name} を更新しました！`);
       }
 
@@ -2637,6 +2676,16 @@
       const cv = pveCanvas(); if (!cv) return;
       const ctx = pveCtx();
       ctx.clearRect(0, 0, PVE_W, PVE_H);
+      // 枠ありの場合、外枠を描画
+      if (pveBorderEnabled) {
+        ctx.save();
+        ctx.strokeStyle = '#81d4fa';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.arc(PVE_W/2, PVE_H/2, PVE_W/2 - 6, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.restore();
+      }
       pveParts.forEach((p, i) => {
         ctx.save();
         ctx.globalAlpha = (p.alpha || 100) / 100;
@@ -2748,6 +2797,22 @@
       cv.addEventListener('pointercancel', () => { pveDragMode = null; });
     }
 
+    let pveBorderEnabled = false;
+
+    function pveBorderSet(on) {
+      pveBorderEnabled = on;
+      document.getElementById('pve-border-on').style.borderColor  = on  ? '#aed581' : '#e0e0e0';
+      document.getElementById('pve-border-on').style.background   = on  ? '#f1f8e9' : '#fff';
+      document.getElementById('pve-border-on').style.color        = on  ? '#388e3c' : '#555';
+      document.getElementById('pve-border-off').style.borderColor = !on ? '#aed581' : '#e0e0e0';
+      document.getElementById('pve-border-off').style.background  = !on ? '#f1f8e9' : '#fff';
+      document.getElementById('pve-border-off').style.color       = !on ? '#388e3c' : '#555';
+      document.getElementById('pve-border-on').innerText  = on  ? 'あり ✓' : 'あり';
+      document.getElementById('pve-border-off').innerText = !on ? 'なし ✓' : 'なし';
+      pveDraw();
+    }
+    window.pveBorderSet = pveBorderSet;
+
     function pveAddPart(shape) {
       pveParts.push({ shape, x: PVE_W/2, y: PVE_H/2, size: 30, color: '#81d4fa', rot: 0, alpha: 100 });
       pveSelected = pveParts.length - 1;
@@ -2814,6 +2879,7 @@
     function pveLoadFromPet(pet) {
       pveParts = pet.parts ? JSON.parse(JSON.stringify(pet.parts)) : [];
       pveSelected = -1;
+      pveBorderSet(pet.border === true);
       pveRefreshUI(); pveDraw();
     }
 
