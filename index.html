@@ -1489,8 +1489,22 @@
     }
 
     // 大きい数字を安全に保存・復元するユーティリティ
+    // 科学的記数法を整数文字列に展開（精度ズレ防止）
+    function numToStr(n) {
+      const str = n.toString();
+      if (!str.includes('e')) return str.split('.')[0]; // 小数点以下切り捨て
+      const [mantissa, exp] = str.split('e');
+      const expNum = parseInt(exp);
+      const [intPart, decPart = ''] = mantissa.split('.');
+      const digits = intPart.replace('-','') + decPart;
+      const dotPos = intPart.replace('-','').length + expNum;
+      const result = dotPos >= digits.length
+        ? digits + '0'.repeat(dotPos - digits.length)
+        : digits.slice(0, dotPos);
+      return (n < 0 ? '-' : '') + result;
+    }
     function saveBigNum(key, n) {
-      const s = BigInt(Math.round(n)).toString();
+      const s = numToStr(n);
       const h = calcHash(key + ':' + s);
       localStorage.setItem(key, s);
       localStorage.setItem(key + '_h', h);
@@ -1506,11 +1520,11 @@
         localStorage.removeItem(key + '_h');
         return defaultVal;
       }
-      try { return Number(BigInt(s)); } catch(e) { return defaultVal; }
+      try { return Number(s); } catch(e) { return defaultVal; }
     }
     function saveStatsObj(obj) {
       const safe = {};
-      for (const k in obj) safe[k] = typeof obj[k] === 'number' ? BigInt(Math.round(obj[k])).toString() : obj[k];
+      for (const k in obj) safe[k] = typeof obj[k] === 'number' ? numToStr(obj[k]) : obj[k];
       const str = JSON.stringify(safe);
       const h = calcHash(LS_STATS + ':' + str);
       localStorage.setItem(LS_STATS, str);
@@ -1529,7 +1543,7 @@
       try {
         const raw = JSON.parse(s);
         const out = {};
-        for (const k in raw) out[k] = typeof raw[k] === 'string' && /^\d+$/.test(raw[k]) ? Number(BigInt(raw[k])) : raw[k];
+        for (const k in raw) out[k] = typeof raw[k] === 'string' && /^-?\d+$/.test(raw[k]) ? Number(raw[k]) : raw[k];
         return out;
       } catch(e) { return defaultObj; }
     }
