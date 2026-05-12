@@ -547,6 +547,246 @@
       color: #aaa;
       z-index: 100;
     }
+
+    /* ===== BAN SCREEN ===== */
+    #ban-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #1a1a2e;
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 18px;
+      text-align: center;
+      padding: 30px;
+    }
+    #ban-screen.show { display: flex; }
+    #ban-screen .ban-icon { font-size: 72px; animation: ban-shake 0.6s ease; }
+    @keyframes ban-shake {
+      0%,100%{transform:rotate(0)} 20%{transform:rotate(-10deg)} 60%{transform:rotate(10deg)}
+    }
+    #ban-screen h1 { color: #ff4757; font-size: 32px; margin: 0; letter-spacing: 2px; }
+    #ban-screen .ban-reason-box {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,71,87,0.4);
+      border-radius: 14px;
+      padding: 16px 28px;
+      color: #ddd;
+      font-size: 15px;
+      max-width: 460px;
+      line-height: 1.7;
+    }
+    #ban-screen .ban-reason-box strong { color: #ff6b81; }
+    #ban-screen .ban-until { color: #aaa; font-size: 13px; }
+    #ban-screen .ban-until span { color: #ffd32a; font-weight: bold; }
+
+    /* ===== PET SCREEN ===== */
+    #pet-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #f0f9ff;
+      z-index: 800;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #pet-screen.open { display: flex; }
+    #pet-header {
+      background: linear-gradient(135deg, #81d4fa, #aed581);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    #pet-header h2 { margin:0; color:white; font-size:20px; text-shadow:0 1px 3px rgba(0,0,0,0.2); }
+    #pet-back-btn {
+      background: rgba(255,255,255,0.9);
+      border: none;
+      border-radius: 20px;
+      padding: 7px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #0288d1;
+    }
+    #pet-back-btn:hover { background: white; }
+    #pet-list-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      align-content: start;
+    }
+    .pet-card {
+      background: white;
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      border: 3px solid #e0e0e0;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+    .pet-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.13); }
+    .pet-card.selected { border-color: #ff8a65; box-shadow: 0 0 0 3px #ffccbc; }
+    .pet-card-name { font-size:16px; font-weight:bold; color:#333; margin-bottom:4px; }
+    .pet-card-type { font-size:12px; background:#fff9c4; color:#f57c00; border-radius:8px; padding:2px 8px; display:inline-block; margin-bottom:8px; }
+    .pet-card-stats { font-size:12px; color:#555; line-height:1.8; }
+    .pet-star-normal { color:#fbc02d; }
+    .pet-star-max    { color:#e53935; }
+    #pet-bottom-bar {
+      background: rgba(255,255,255,0.97);
+      border-top: 3px solid #e0e0e0;
+      padding: 12px 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .pet-action-btn {
+      padding: 10px 22px;
+      border-radius: 14px;
+      border: none;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .pet-action-btn:active { transform: scale(0.95); }
+    #pet-create-btn { background:#ffb74d; color:white; box-shadow:0 3px 0 #f57c00; }
+    #pet-create-btn:hover { background:#f57c00; }
+    #pet-edit-btn   { background:#81d4fa; color:white; box-shadow:0 3px 0 #0288d1; }
+    #pet-edit-btn:hover { background:#4fc3f7; }
+    #pet-race-btn   { background:#81c784; color:white; box-shadow:0 3px 0 #388e3c; }
+    #pet-race-btn:hover { background:#66bb6a; }
+
+    /* ===== PET EDITOR ===== */
+    #pet-editor {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 850;
+      align-items: center;
+      justify-content: center;
+    }
+    #pet-editor.open { display: flex; }
+    #pet-editor-box {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      width: 700px;
+      max-width: 96vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+    .pet-editor-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ef6c00;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pet-editor-row {
+      margin-bottom: 14px;
+    }
+    .pet-editor-label {
+      font-size: 13px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pet-editor-label .cost-tag {
+      font-size: 11px;
+      color: #888;
+      font-weight: normal;
+    }
+    .pet-editor-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    .pet-editor-input:focus { outline:none; border-color:#81d4fa; }
+    .pet-type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      width: 100%;
+    }
+    .pet-type-btn {
+      padding: 8px 4px;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      min-width: 0;
+      word-break: break-all;
+    }
+    .pet-type-btn:hover { background:#f5f5f5; }
+    .pet-type-btn.selected { border-color:#ffb74d; background:#fff8e1; color:#ef6c00; }
+    .pet-stat-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pet-stat-row input[type=range] { flex:1; }
+    .pet-stat-val { font-size:14px; font-weight:bold; color:#333; min-width:30px; text-align:right; }
+    .pet-cost-box {
+      background: #fffde7;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 14px 0;
+      font-size: 13px;
+    }
+    .pet-cost-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: #555;
+    }
+    .pet-cost-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: bold;
+      color: #ef6c00;
+      border-top: 1px solid #ffe082;
+      padding-top: 8px;
+      margin-top: 6px;
+    }
+    .pet-confirm-btn {
+      width: 100%;
+      padding: 13px;
+      background: #ffb74d;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #f57c00;
+      transition: background 0.2s;
+    }
+    .pet-confirm-btn:hover { background: #f57c00; }
+    .pet-confirm-btn:disabled { background:#ccc; box-shadow:none; cursor:not-allowed; }
+    #pet-editor-msg { min-height:1.2em; font-size:12px; color:#e53935; margin-top:8px; text-align:center; }
   </style>
 </head>
 <body onload="appInit()">
@@ -563,6 +803,7 @@
     <button id="profile-btn" onclick="openProfile()">👤 プロフィール</button>
     <button id="ranking-btn" onclick="openRanking()">🏆 ランキング</button>
     <button id="rules-btn" onclick="openRules()" style="background:rgba(255,255,255,0.97);border:2px solid #81d4fa;border-radius:10px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold;color:#0288d1;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background 0.2s;">📖 る～るせつめい</button>
+    <button onclick="openPetScreen()" style="background:rgba(255,255,255,0.97);border:2px solid #ce93d8;border-radius:10px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold;color:#7b1fa2;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background 0.2s;">🐾 ペット</button>
   </div>
 
   <!-- レース画面 -->
@@ -897,9 +1138,129 @@
     </div>
   </div>
 
+  <!-- ===== PET SCREEN ===== -->
+  <div id="pet-screen">
+    <div id="pet-header">
+      <button id="pet-back-btn" onclick="closePetScreen()">← もどる</button>
+      <h2>🐾 マイペット</h2>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button onclick="openOnlinePets()" style="background:rgba(255,255,255,0.9);border:none;border-radius:16px;padding:6px 14px;font-size:13px;font-weight:bold;color:#7b1fa2;cursor:pointer;">🌐 みんなのペット</button>
+        <div style="font-size:13px;color:white;font-weight:bold;">残高: <span id="pet-screen-balance">-</span>円</div>
+      </div>
+    </div>
+    <div id="pet-list-area">
+      <div id="pet-empty-msg" style="grid-column:1/-1;text-align:center;color:#aaa;padding:40px;font-size:16px;">
+        ペットがいません。作成ボタンから作ってみよう！
+      </div>
+    </div>
+    <div id="pet-bottom-bar">
+      <span id="pet-selected-name" style="flex:1;font-size:13px;color:#888;"></span>
+      <button class="pet-action-btn" id="pet-race-btn" onclick="petRaceBet()" style="display:none;">🎰 このペットで賭ける（10京円）</button>
+      <button class="pet-action-btn" id="pet-edit-btn" onclick="openPetEditor(true)">✏️ 編集</button>
+      <button class="pet-action-btn" id="pet-create-btn" onclick="openPetEditor(false)">＋ 作成</button>
+    </div>
+  </div>
+
+  <!-- ===== PET EDITOR ===== -->
+  <div id="pet-editor">
+    <div id="pet-editor-box">
+      <div class="pet-editor-title">
+        <span id="pet-editor-title-text">🐾 ペット作成</span>
+        <button class="close-btn" onclick="closePetEditor()">✕</button>
+      </div>
+
+      <!-- 名前 -->
+      <div class="pet-editor-row">
+        <div class="pet-editor-label">ペット名 <span class="cost-tag">（名前変更無料）</span></div>
+        <input id="pet-name-input" class="pet-editor-input" type="text" maxlength="16" placeholder="名前を入力（最大16文字）" oninput="updatePetCost()" />
+      </div>
+
+      <!-- タイプ -->
+      <div class="pet-editor-row">
+        <div class="pet-editor-label">タイプ <span class="cost-tag" id="pet-type-cost-label"></span></div>
+        <div class="pet-type-grid" id="pet-type-grid"></div>
+      </div>
+
+      <!-- 色 -->
+      <div class="pet-editor-row">
+        <div class="pet-editor-label">色 <span class="cost-tag">0円</span></div>
+        <input id="pet-color-input" type="color" value="#81d4fa" oninput="updatePetCost()"
+          style="width:100%;height:40px;border-radius:10px;border:2px solid #e0e0e0;cursor:pointer;padding:2px;" />
+      </div>
+
+      <!-- はやさ -->
+      <div class="pet-editor-row">
+        <div class="pet-editor-label">⚡ はやさ <span class="cost-tag" id="pet-spd-cost-label"></span></div>
+        <div class="pet-stat-row">
+          <input type="range" id="pet-spd-range" min="1" max="100" value="1" oninput="updatePetCost()">
+          <span class="pet-stat-val" id="pet-spd-val">3</span>
+          <span id="pet-spd-stars" style="font-family:monospace;font-size:14px;"></span>
+        </div>
+      </div>
+
+      <!-- スタミナ -->
+      <div class="pet-editor-row">
+        <div class="pet-editor-label">💪 スタミナ <span class="cost-tag" id="pet-stm-cost-label"></span></div>
+        <div class="pet-stat-row">
+          <input type="range" id="pet-stm-range" min="1" max="100" value="1" oninput="updatePetCost()">
+          <span class="pet-stat-val" id="pet-stm-val">3</span>
+          <span id="pet-stm-stars" style="font-family:monospace;font-size:14px;"></span>
+        </div>
+      </div>
+
+      <!-- オッズ固定倍率 -->
+      <div class="pet-editor-row">
+        <div class="pet-editor-label">🎯 オッズ固定倍率 <span class="cost-tag" id="pet-odds-cost-label"></span></div>
+        <div class="pet-stat-row">
+          <input type="range" id="pet-odds-range" min="1" max="50" value="1" step="0.5" oninput="updatePetCost()">
+          <span class="pet-stat-val" id="pet-odds-val">1</span>
+          <span style="font-size:13px;color:#888;">x</span>
+        </div>
+      </div>
+
+      <!-- 費用内訳 -->
+      <div class="pet-cost-box">
+        <div class="pet-cost-row"><span>初期費用</span><span>100京円</span></div>
+        <div class="pet-cost-row"><span>タイプ費用</span><span id="pc-type">-</span></div>
+        <div class="pet-cost-row"><span>はやさ費用</span><span id="pc-spd">-</span></div>
+        <div class="pet-cost-row"><span>スタミナ費用</span><span id="pc-stm">-</span></div>
+        <div class="pet-cost-row"><span>オッズ倍率費用</span><span id="pc-odds">-</span></div>
+        <div class="pet-cost-total"><span>合計</span><span id="pc-total">-</span></div>
+        <div style="margin-top:6px;font-size:12px;color:#888;">あなたの残高: <span id="pc-balance">-</span>円</div>
+      </div>
+
+      <div id="pet-editor-msg"></div>
+      <button class="pet-confirm-btn" id="pet-confirm-btn" onclick="confirmPetEditor()">✅ 決定！</button>
+    </div>
+  </div>
+
+  <!-- ===== ONLINE PETS MODAL ===== -->
+  <div class="modal-overlay" id="online-pets-modal">
+    <div class="modal-box" style="width:620px;max-width:96vw;">
+      <div class="modal-title">
+        <span>🌐 みんなのペット</span>
+        <button class="close-btn" onclick="closeModal('online-pets-modal')">✕</button>
+      </div>
+      <div id="online-pets-list" style="font-size:14px;">
+        <div style="text-align:center;color:#aaa;padding:20px;">読み込み中...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST -->
   <div id="toast"></div>
   <div id="firebase-status">Firebase: 初期化中...</div>
+
+  <!-- BAN SCREEN -->
+  <div id="ban-screen">
+    <div class="ban-icon">🚫</div>
+    <h1>アクセス禁止</h1>
+    <div class="ban-reason-box">
+      <strong>理由：</strong><span id="ban-reason-text">利用規約違反</span>
+    </div>
+    <div class="ban-until" id="ban-until-text"></div>
+    <div style="color:#555;font-size:12px;margin-top:10px;">お問い合わせは管理者までご連絡ください</div>
+  </div>
 
   <!-- ===== Firebase SDK ===== -->
   <script type="module">
@@ -947,6 +1308,22 @@
       }
     };
 
+    window._fbSavePets = async function(userId, petsArr) {
+      if (!firebaseOK || !db) return;
+      try {
+        await set(ref(db, 'pets/' + userId), { pets: petsArr, updatedAt: Date.now() });
+      } catch(e) { console.warn('Firebase pets save failed:', e); }
+    };
+
+    window._fbGetAllPets = async function() {
+      if (!firebaseOK || !db) return null;
+      try {
+        const snapshot = await get(ref(db, 'pets'));
+        if (snapshot.exists()) return snapshot.val();
+        return {};
+      } catch(e) { console.warn('Firebase pets get failed:', e); return null; }
+    };
+
     window._fbGetRanking = async function() {
       if (!firebaseOK || !db) return null;
       try {
@@ -956,6 +1333,38 @@
       } catch(e) {
         console.warn('Firebase get failed:', e);
         return null;
+      }
+    };
+
+    // ===== 管理者オーバーライド取得 =====
+    // Firebase Realtime DB の /admin_overrides/{userId} を読む
+    // 書き込みは Firebase コンソールまたは管理ツールから行う
+    // 構造例:
+    //   admin_overrides/{userId}: {
+    //     balance: 5000,          // 残高を強制セット（省略可）
+    //     banned: true,           // BANフラグ
+    //     banReason: "不正行為",  // BAN理由（省略可）
+    //     banUntil: 1234567890000 // BAN期限（UNIXミリ秒）。0または省略＝永久BAN
+    //   }
+    window._fbGetAdminOverride = async function(uid) {
+      if (!firebaseOK || !db) return null;
+      try {
+        const snapshot = await get(ref(db, 'admin_overrides/' + uid));
+        if (snapshot.exists()) return snapshot.val();
+        return null;
+      } catch(e) {
+        console.warn('Firebase admin_overrides get failed:', e);
+        return null;
+      }
+    };
+
+    // 適用済みフラグを立てる（残高上書きを一回だけ適用するため）
+    window._fbMarkOverrideApplied = async function(uid, field) {
+      if (!firebaseOK || !db) return;
+      try {
+        await set(ref(db, 'admin_overrides/' + uid + '/' + field), null);
+      } catch(e) {
+        console.warn('Firebase admin_overrides mark failed:', e);
       }
     };
   </script>
@@ -992,18 +1401,87 @@
       return n.toLocaleString();
     }
 
+    // チート対策：簡易ハッシュ（XOR + 素数乗算）
+    const CHEAT_SALT = 'roborace_v1_salt_x9f2';
+    function calcHash(str) {
+      let h = 0x811c9dc5;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = (h * 0x01000193) >>> 0;
+      }
+      for (let i = 0; i < CHEAT_SALT.length; i++) {
+        h ^= CHEAT_SALT.charCodeAt(i);
+        h = (h * 0x01000193) >>> 0;
+      }
+      return h.toString(16);
+    }
+
+    // 大きい数字を安全に保存・復元するユーティリティ
+    function saveBigNum(key, n) {
+      const s = BigInt(Math.round(n)).toString();
+      const h = calcHash(key + ':' + s);
+      localStorage.setItem(key, s);
+      localStorage.setItem(key + '_h', h);
+    }
+    function loadBigNum(key, defaultVal) {
+      const s = localStorage.getItem(key);
+      const h = localStorage.getItem(key + '_h');
+      if (!s) return defaultVal;
+      // ハッシュ検証
+      if (h !== calcHash(key + ':' + s)) {
+        console.warn('[CHEAT] tampered:', key, '→ reset to default');
+        localStorage.removeItem(key);
+        localStorage.removeItem(key + '_h');
+        return defaultVal;
+      }
+      try { return Number(BigInt(s)); } catch(e) { return defaultVal; }
+    }
+    function saveStatsObj(obj) {
+      const safe = {};
+      for (const k in obj) safe[k] = typeof obj[k] === 'number' ? BigInt(Math.round(obj[k])).toString() : obj[k];
+      const str = JSON.stringify(safe);
+      const h = calcHash(LS_STATS + ':' + str);
+      localStorage.setItem(LS_STATS, str);
+      localStorage.setItem(LS_STATS + '_h', h);
+    }
+    function loadStatsObj(defaultObj) {
+      const s = localStorage.getItem(LS_STATS);
+      const h = localStorage.getItem(LS_STATS + '_h');
+      if (!s) return defaultObj;
+      if (h !== calcHash(LS_STATS + ':' + s)) {
+        console.warn('[CHEAT] tampered: stats → reset');
+        localStorage.removeItem(LS_STATS);
+        localStorage.removeItem(LS_STATS + '_h');
+        return defaultObj;
+      }
+      try {
+        const raw = JSON.parse(s);
+        const out = {};
+        for (const k in raw) out[k] = typeof raw[k] === 'string' && /^\d+$/.test(raw[k]) ? Number(BigInt(raw[k])) : raw[k];
+        return out;
+      } catch(e) { return defaultObj; }
+    }
     const LS_BALANCE  = 'roborace_balance';
     const LS_PROFILE  = 'roborace_profile';
     const LS_STATS    = 'roborace_stats';
     const LS_HISTORY  = 'roborace_history';
     const LS_USERID   = 'roborace_userid';
+    const LS_PETS     = 'roborace_pets';
+
+    let playerBalance = 1000;
+    let profile = { name: 'プレイヤー', spirit: 'よろしく！' };
+    let stats = { totalBets: 0, wins: 0, peakBalance: 1000, totalEarned: 0 };
+    let betHistory = [];
+    let userId = '';
+    let pets = [];
 
     function loadData() {
-      playerBalance = parseInt(localStorage.getItem(LS_BALANCE) || '1000', 10);
+      playerBalance = loadBigNum(LS_BALANCE, 1000);
       const defaultName = 'プレイヤー' + (Math.floor(Math.random() * 900) + 100);
       profile = JSON.parse(localStorage.getItem(LS_PROFILE) || `{"name":"${defaultName}","spirit":"よろしく！"}`);
-      stats = JSON.parse(localStorage.getItem(LS_STATS) || '{"totalBets":0,"wins":0,"peakBalance":1000,"totalEarned":0}');
+      stats = loadStatsObj({totalBets:0, wins:0, peakBalance:1000, totalEarned:0});
       betHistory = JSON.parse(localStorage.getItem(LS_HISTORY) || '[]');
+      pets = JSON.parse(localStorage.getItem(LS_PETS) || '[]');
       if (!localStorage.getItem(LS_USERID)) {
         const uid = 'user_' + Math.random().toString(36).slice(2,10);
         localStorage.setItem(LS_USERID, uid);
@@ -1012,10 +1490,11 @@
     }
 
     function saveData() {
-      localStorage.setItem(LS_BALANCE, playerBalance);
+      saveBigNum(LS_BALANCE, playerBalance);
       localStorage.setItem(LS_PROFILE, JSON.stringify(profile));
-      localStorage.setItem(LS_STATS, JSON.stringify(stats));
+      saveStatsObj(stats);
       localStorage.setItem(LS_HISTORY, JSON.stringify(betHistory.slice(-30)));
+      localStorage.setItem(LS_PETS, JSON.stringify(pets));
     }
 
     function syncToFirebase() {
@@ -1023,12 +1502,6 @@
         window._fbSaveRanking(userId, profile.name, playerBalance, stats.totalBets, stats.wins, profile.spirit);
       }
     }
-
-    let playerBalance = 1000;
-    let profile = { name: 'プレイヤー', spirit: 'よろしく！' };
-    let stats = { totalBets: 0, wins: 0, peakBalance: 1000, totalEarned: 0 };
-    let betHistory = [];
-    let userId = '';
 
     function openProfile() {
       document.getElementById('prof-display-name').innerText = profile.name;
@@ -1398,6 +1871,44 @@
     function checkPayoutsOnFinish() {
       const winner = 終わり[0];
       if (!winner) return;
+
+      // ペット賭けの精算
+      if (petRaceBetActive && petRaceBetInfo) {
+        const pet = petRaceBetInfo;
+        // ペットのスピードをロボに変換してオッズ計算
+        const petSpd = 3 + (pet.spd / 100) * 5;
+        const petStmVal = 700 + (pet.stm / 100) * 1000;
+        const posFactor = 1;
+        const sfVal = 0.5 + 1.2;
+        const pb = {dash:1.15,climb:1.08,lucky:1.05,tough:1.03}[pet.type] || 1.0;
+        const baseScore = petSpd * posFactor * sfVal * pb;
+        const total = filteredRobots.reduce((s, r) => {
+          const pf = 1 + (r.x / goalPx);
+          const sf = 0.5 + (r.energy / r.maxEnergy) * 1.2;
+          const pb2 = {dash:1.15,climb:1.08,lucky:1.05,tough:1.03}[r.type] || 1.0;
+          return s + r.baseSpeed * pf * sf * pb2;
+        }, 0.0001);
+        const winProb = Math.max(0.0005, baseScore / total);
+        const baseOdds = Math.max(1.1, Math.round((1 / winProb) * 10) / 10);
+        const finalOdds = Math.round(baseOdds * pet.oddsX * 10) / 10;
+
+        // ペットは「ランダムに勝敗」：勝率に基づいて判定
+        const petWon = Math.random() < winProb;
+        if (petWon) {
+          const payout = Math.floor(PET_RACE_COST * finalOdds);
+          playerBalance += payout;
+          showToast(`🐾 ${pet.name} 勝利！ +${formatMoney(payout)}円（オッズ${finalOdds}x）`);
+          stats.totalEarned += payout;
+        } else {
+          showToast(`🐾 ${pet.name} 敗北…`);
+        }
+        if (playerBalance > stats.peakBalance) stats.peakBalance = playerBalance;
+        document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+        saveData();
+        petRaceBetActive = false;
+        petRaceBetInfo   = null;
+      }
+
       if (currentBet) {
         stats.totalBets++;
         const won = currentBet.botId === winner.id;
@@ -1407,8 +1918,8 @@
           playerBalance += payout;
           stats.wins++;
           stats.totalEarned += payout;
-          showToast(`🎉 的中！ No.${winner.id} が優勝！ +${payout}円`);
-          showBetMsg(`的中！配当 ${payout}円 獲得！`);
+          showToast(`🎉 的中！ No.${winner.id} が優勝！ +${formatMoney(payout)}円`);
+          showBetMsg(`的中！配当 ${formatMoney(payout)}円 獲得！`);
         } else {
           showToast(`😢 外れ… No.${winner.id} が優勝`);
           showBetMsg(`外れ：No.${winner.id} が勝ちました`);
@@ -1483,6 +1994,18 @@
 
     function start() {
       if (!timer) {
+        // ペット賭けが有効なら参加費を引く
+        if (petRaceBetActive && petRaceBetInfo) {
+          if (playerBalance < PET_RACE_COST) {
+            showToast('ペット参加費（10京円）が足りません。キャンセルします');
+            petRaceBetActive = false; petRaceBetInfo = null;
+          } else {
+            playerBalance -= PET_RACE_COST;
+            document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+            saveData();
+            showBetMsg(`🐾 ${petRaceBetInfo.name} で参加！（10京円）`);
+          }
+        }
         lockBetting();
         document.getElementById('start-controls').style.display = 'none';
         timer = setInterval(stepAndCheckFinish, 40);
@@ -1494,6 +2017,8 @@
       timer = null;
       unlockBetting();
       currentBet = null;
+      petRaceBetActive = false;
+      petRaceBetInfo   = null;
       document.getElementById('bet-msg').innerText = '';
       document.getElementById('retry-controls').style.display = 'none';
       initRace();
@@ -1583,6 +2108,278 @@
     }
     window.openRules = openRules;
 
+    // ===== ペット定数 =====
+    const PET_TYPE_COST = {
+      lucky:75e15, crowd:75e15, tough:125e15, warp:250e15,
+      random:500e15, climb:100e15, relax:50e15, dash:75e15
+    };
+    // ★表示ルール:
+    // 1-5  → 黄★×値
+    // 6-9  → 赤★×(値-5) + 黄★×(10-値)
+    // 10+  → 赤★×5
+    function petStars(val) {
+      const v = Math.max(1, parseInt(val));
+      let html = '';
+      if (v <= 5) {
+        html = `<span style="color:#fbc02d;font-family:monospace;">${'★'.repeat(v)}${'☆'.repeat(5-v)}</span>`;
+      } else if (v < 10) {
+        const red = v - 5;
+        const yellow = 5 - red;
+        html = `<span style="color:#e53935;font-family:monospace;">${'★'.repeat(red)}</span><span style="color:#fbc02d;font-family:monospace;">${'★'.repeat(yellow)}</span>`;
+      } else {
+        html = `<span style="color:#e53935;font-family:monospace;">★★★★★</span>`;
+      }
+      return html;
+    }
+    function petCostCalc(type, spd, stm, oddsX) {
+      const init    = 100e15;
+      const typeCost = PET_TYPE_COST[type] || 0;
+      const spdCost  = (spd - 1) * 15e15;
+      const stmCost  = (stm - 1) * 15e15;
+      const oddsCost = (oddsX - 1) * 1000e15;
+      return { init, typeCost, spdCost, stmCost, oddsCost,
+               total: init + typeCost + spdCost + stmCost + oddsCost };
+    }
+
+    let selectedPetIdx = -1;
+    let petEditorMode  = 'create'; // 'create' | 'edit'
+
+    function openPetScreen() {
+      document.getElementById('pet-screen').classList.add('open');
+      renderPetList();
+      document.getElementById('pet-screen-balance').innerText = formatMoney(playerBalance);
+    }
+    function closePetScreen() {
+      document.getElementById('pet-screen').classList.remove('open');
+      selectedPetIdx = -1;
+    }
+
+    function renderPetList() {
+      const area = document.getElementById('pet-list-area');
+      const empty = document.getElementById('pet-empty-msg');
+      area.querySelectorAll('.pet-card').forEach(c => c.remove());
+      if (pets.length === 0) {
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        pets.forEach((p, i) => {
+          const card = document.createElement('div');
+          card.className = 'pet-card' + (selectedPetIdx === i ? ' selected' : '');
+          card.innerHTML = `
+            <div class="pet-card-name" style="color:${p.color}">${escHtml(p.name)}</div>
+            <div class="pet-card-type">${PERSONALITIES[p.type]?.name || p.type}</div>
+            <div class="pet-card-stats">
+              ⚡ はやさ: ${petStars(p.spd)} (${p.spd})<br>
+              💪 スタミナ: ${petStars(p.stm)} (${p.stm})<br>
+              🎯 オッズ倍率: ${p.oddsX}x<br>
+              🎨 色: <span style="display:inline-block;width:14px;height:14px;background:${p.color};border-radius:3px;vertical-align:middle;border:1px solid #ccc;"></span>
+            </div>`;
+          card.onclick = () => {
+            selectedPetIdx = i;
+            document.querySelectorAll('.pet-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('pet-selected-name').innerText = `選択中: ${p.name}`;
+            document.getElementById('pet-race-btn').style.display = 'inline-block';
+          };
+          area.appendChild(card);
+        });
+      }
+    }
+
+    function openPetEditor(isEdit) {
+      petEditorMode = isEdit ? 'edit' : 'create';
+      if (isEdit && selectedPetIdx < 0) { showToast('編集するペットを選んでください'); return; }
+      if (!isEdit && pets.length >= 25) { showToast('ペットは最大25体まで'); return; }
+
+      // タイプグリッド生成
+      const typeGrid = document.getElementById('pet-type-grid');
+      typeGrid.innerHTML = '';
+      const typeKeys = Object.keys(PERSONALITIES);
+      typeKeys.forEach(t => {
+        const btn = document.createElement('button');
+        btn.className = 'pet-type-btn';
+        btn.dataset.type = t;
+        btn.innerHTML = `${PERSONALITIES[t].name}<br><span style="font-size:10px;color:#999;">${formatMoney(PET_TYPE_COST[t])}円</span>`;
+        btn.onclick = () => {
+          document.querySelectorAll('.pet-type-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          updatePetCost();
+        };
+        typeGrid.appendChild(btn);
+      });
+
+      if (isEdit) {
+        const p = pets[selectedPetIdx];
+        document.getElementById('pet-editor-title-text').innerText = '✏️ ペット編集';
+        document.getElementById('pet-name-input').value = p.name;
+        document.getElementById('pet-color-input').value = p.color;
+        document.getElementById('pet-spd-range').value = p.spd;
+        document.getElementById('pet-stm-range').value = p.stm;
+        document.getElementById('pet-odds-range').value = p.oddsX;
+        typeGrid.querySelectorAll('.pet-type-btn').forEach(b => {
+          if (b.dataset.type === p.type) b.classList.add('selected');
+        });
+      } else {
+        document.getElementById('pet-editor-title-text').innerText = '🐾 ペット作成';
+        document.getElementById('pet-name-input').value = '';
+        document.getElementById('pet-color-input').value = '#81d4fa';
+        document.getElementById('pet-spd-range').value = 1;
+        document.getElementById('pet-stm-range').value = 1;
+        document.getElementById('pet-odds-range').value = 1;
+        typeGrid.querySelector('.pet-type-btn')?.classList.add('selected');
+      }
+
+      document.getElementById('pet-editor-msg').innerText = '';
+      updatePetCost();
+      document.getElementById('pet-editor').classList.add('open');
+    }
+
+    function closePetEditor() {
+      document.getElementById('pet-editor').classList.remove('open');
+    }
+
+    function getSelectedType() {
+      const sel = document.querySelector('.pet-type-btn.selected');
+      return sel ? sel.dataset.type : Object.keys(PERSONALITIES)[0];
+    }
+
+    function updatePetCost() {
+      const spd   = parseInt(document.getElementById('pet-spd-range').value);
+      const stm   = parseInt(document.getElementById('pet-stm-range').value);
+      const oddsX = parseFloat(document.getElementById('pet-odds-range').value);
+      const type  = getSelectedType();
+      const c     = petCostCalc(type, spd, stm, oddsX);
+
+      document.getElementById('pet-spd-val').innerText = spd;
+      document.getElementById('pet-stm-val').innerText = stm;
+      document.getElementById('pet-odds-val').innerText = oddsX;
+      document.getElementById('pet-spd-stars').innerHTML = petStars(spd);
+      document.getElementById('pet-stm-stars').innerHTML = petStars(stm);
+
+      document.getElementById('pc-type').innerText  = formatMoney(c.typeCost)  + '円';
+      document.getElementById('pc-spd').innerText   = formatMoney(c.spdCost)   + '円';
+      document.getElementById('pc-stm').innerText   = formatMoney(c.stmCost)   + '円';
+      document.getElementById('pc-odds').innerText  = formatMoney(c.oddsCost)  + '円';
+      document.getElementById('pc-total').innerText = formatMoney(c.total)     + '円';
+      document.getElementById('pc-balance').innerText = formatMoney(playerBalance);
+
+      const canAfford = playerBalance >= c.total;
+      document.getElementById('pet-confirm-btn').disabled = !canAfford;
+
+      // 編集モードは差額のみ
+      if (petEditorMode === 'edit' && selectedPetIdx >= 0) {
+        const oldP = pets[selectedPetIdx];
+        const oldC = petCostCalc(oldP.type, oldP.spd, oldP.stm, oldP.oddsX);
+        const diff = c.total - oldC.total;
+        document.getElementById('pet-confirm-btn').disabled = diff > 0 && playerBalance < diff;
+        document.getElementById('pet-editor-msg').innerText =
+          diff > 0 ? `追加費用: ${formatMoney(diff)}円` :
+          diff < 0 ? `返金: ${formatMoney(-diff)}円` : '';
+      } else {
+        document.getElementById('pet-editor-msg').innerText = '';
+      }
+    }
+
+    function confirmPetEditor() {
+      const name  = document.getElementById('pet-name-input').value.trim();
+      if (!name) { document.getElementById('pet-editor-msg').innerText = '名前を入力してください'; return; }
+      const spd   = parseInt(document.getElementById('pet-spd-range').value);
+      const stm   = parseInt(document.getElementById('pet-stm-range').value);
+      const oddsX = parseFloat(document.getElementById('pet-odds-range').value);
+      const type  = getSelectedType();
+      const color = document.getElementById('pet-color-input').value;
+      const c     = petCostCalc(type, spd, stm, oddsX);
+
+      if (petEditorMode === 'create') {
+        if (playerBalance < c.total) { document.getElementById('pet-editor-msg').innerText = '残高が足りません'; return; }
+        playerBalance -= c.total;
+        pets.push({ name, type, spd, stm, oddsX, color });
+        showToast(`🐾 ${name} を作成しました！`);
+      } else {
+        const oldP = pets[selectedPetIdx];
+        const oldC = petCostCalc(oldP.type, oldP.spd, oldP.stm, oldP.oddsX);
+        const diff = c.total - oldC.total;
+        if (diff > 0 && playerBalance < diff) { document.getElementById('pet-editor-msg').innerText = '追加費用が足りません'; return; }
+        playerBalance -= diff;
+        pets[selectedPetIdx] = { name, type, spd, stm, oddsX, color };
+        showToast(`✏️ ${name} を更新しました！`);
+      }
+
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+      document.getElementById('pet-screen-balance').innerText = formatMoney(playerBalance);
+      saveData();
+      closePetEditor();
+      renderPetList();
+    }
+
+    const PET_RACE_COST = 10e15; // 10京円
+    let petRaceBetActive = false;
+    let petRaceBetInfo   = null;
+
+    function petRaceBet() {
+      if (selectedPetIdx < 0) { showToast('ペットを選んでください'); return; }
+      if (playerBalance < PET_RACE_COST) { showToast(`残高不足。10京円(${formatMoney(PET_RACE_COST)}円)必要`); return; }
+      const pet = pets[selectedPetIdx];
+      closePetScreen();
+      // ペット賭けフラグをセット（次レース開始時に使用）
+      petRaceBetActive = true;
+      petRaceBetInfo   = { ...pet };
+      showToast(`🐾 ${pet.name} で次のレースに参加！（10京円）`);
+    }
+    window.openPetScreen = openPetScreen;
+    window.closePetScreen = closePetScreen;
+    window.openPetEditor = openPetEditor;
+    window.closePetEditor = closePetEditor;
+    window.updatePetCost = updatePetCost;
+    window.confirmPetEditor = confirmPetEditor;
+    window.petRaceBet = petRaceBet;
+
+    async function openOnlinePets() {
+      document.getElementById('online-pets-modal').classList.add('open');
+      document.getElementById('online-pets-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">読み込み中...</div>';
+      // 自分のペットをFirebaseに同期
+      if (typeof window._fbSavePets === 'function' && pets.length > 0) {
+        await window._fbSavePets(userId, pets.map(p => ({ ...p, ownerName: profile.name })));
+      }
+      const allData = typeof window._fbGetAllPets === 'function' ? await window._fbGetAllPets() : null;
+      if (!allData) {
+        document.getElementById('online-pets-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">データを取得できませんでした</div>';
+        return;
+      }
+      // 全ユーザーのペットをフラットに展開
+      const allPets = [];
+      for (const [uid, data] of Object.entries(allData)) {
+        if (data.pets) {
+          for (const p of data.pets) {
+            allPets.push({ ...p, isMe: uid === userId });
+          }
+        }
+      }
+      if (allPets.length === 0) {
+        document.getElementById('online-pets-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">まだペットがいません</div>';
+        return;
+      }
+      document.getElementById('online-pets-list').innerHTML = `
+        <div style="margin-bottom:10px;font-size:12px;color:#888;">${allPets.length}体のペットがいます</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;">
+          ${allPets.map(p => `
+            <div style="background:${p.isMe?'#fffde7':'#f9f9f9'};border-radius:14px;padding:12px;border:2px solid ${p.isMe?'#ffd54f':'#e0e0e0'};">
+              <div style="font-size:15px;font-weight:bold;color:${p.color||'#333'};margin-bottom:3px;">${escHtml(p.name||'名無し')}</div>
+              ${p.isMe ? '<div style="font-size:10px;color:#f57c00;font-weight:bold;margin-bottom:3px;">あなたのペット</div>' : ''}
+              <div style="font-size:11px;color:#f57c00;background:#fff9c4;border-radius:6px;padding:2px 7px;display:inline-block;margin-bottom:6px;">${PERSONALITIES[p.type]?.name||p.type||'不明'}</div>
+              <div style="font-size:11px;color:#555;line-height:1.9;">
+                ⚡ はやさ: ${petStars(p.spd||1)} (${p.spd||1})<br>
+                💪 スタミナ: ${petStars(p.stm||1)} (${p.stm||1})<br>
+                🎯 倍率: ${p.oddsX||1}x
+              </div>
+              <div style="margin-top:6px;font-size:11px;color:#888;">
+                オーナー: ${escHtml(p.ownerName||'？')}
+              </div>
+            </div>`).join('')}
+        </div>`;
+    }
+    window.openOnlinePets = openOnlinePets;
+
     function resetBalance() {
       if (!confirm('残高を1000円にリセットしますか？')) return;
       playerBalance = 1000;
@@ -1634,9 +2431,79 @@
       showToast('🗑️ すべてリセットしました');
     }
 
+    // ===== 管理者オーバーライド適用 =====
+    // Firebase /admin_overrides/{userId} の内容をチェックし反映する。
+    // ・balance  → 残高を強制上書き（適用後Firebaseから削除して二重適用防止）
+    // ・banned   → BANフラグ。banUntil(UNIXミリ秒)がある場合は期限付き
+    // ・banReason → BAN理由テキスト
+    async function checkAdminOverrides() {
+      if (typeof window._fbGetAdminOverride !== 'function') return;
+      const ov = await window._fbGetAdminOverride(userId);
+      if (!ov) return;
+
+      // ----- 残高上書き（BAN中でも先に処理して localStorage に保存する）-----
+      // BAN中でも残高を書いておくことで、BAN解除後の初回loadに即反映される。
+      if (ov.balance !== undefined && ov.balance !== null) {
+        const newBal = Number(ov.balance);
+        if (!isNaN(newBal) && newBal >= 0) {
+          playerBalance = newBal;
+          // localStorage にハッシュ付きで保存 → 次回以降の loadData() でも正しく読まれる
+          saveBigNum(LS_BALANCE, playerBalance);
+          if (stats.peakBalance < playerBalance) stats.peakBalance = playerBalance;
+          saveStatsObj(stats);
+          // Firebase のランキングも更新（BAN中は後でブロックされるが書いておく）
+          syncToFirebase();
+          // UI更新
+          document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+          // Firebase 上の balance フィールドを削除（二重適用防止）
+          if (typeof window._fbMarkOverrideApplied === 'function') {
+            await window._fbMarkOverrideApplied(userId, 'balance');
+          }
+        }
+      }
+
+      // ----- BAN チェック（残高処理の後で判定）-----
+      if (ov.banned === true) {
+        const now = Date.now();
+        const until = ov.banUntil ? Number(ov.banUntil) : 0;
+        const isExpired = until > 0 && now >= until;
+
+        if (!isExpired) {
+          // BAN有効 → 画面を完全ロック
+          const reason = ov.banReason || '利用規約違反';
+          document.getElementById('ban-reason-text').innerText = reason;
+
+          if (until > 0) {
+            const d = new Date(until);
+            const fmt = d.getFullYear() + '/' +
+              String(d.getMonth()+1).padStart(2,'0') + '/' +
+              String(d.getDate()).padStart(2,'0') + ' ' +
+              String(d.getHours()).padStart(2,'0') + ':' +
+              String(d.getMinutes()).padStart(2,'0');
+            document.getElementById('ban-until-text').innerHTML =
+              'BAN期限：<span>' + fmt + '</span> まで';
+          } else {
+            document.getElementById('ban-until-text').innerText = '期限：永久BAN';
+          }
+
+          document.getElementById('ban-screen').classList.add('show');
+          if (typeof timer !== 'undefined' && timer) clearInterval(timer);
+          return;
+        }
+        // 期限切れBANは無視して続行
+      }
+
+      // BAN中でない場合のみトーストを表示
+      if (ov.balance !== undefined && ov.balance !== null) {
+        showToast('💰 残高が管理者により ' + formatMoney(playerBalance) + '円 に変更されました');
+      }
+    }
+
     function appInit() {
       loadData();
       initRace();
+      // 管理者オーバーライドをページ読み込み時にチェック
+      checkAdminOverrides();
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
           document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
