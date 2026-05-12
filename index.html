@@ -932,16 +932,16 @@
         <span>🎰 次のレースに賭ける</span>
         <button class="close-btn" onclick="closeModal('prerace-modal')">✕</button>
       </div>
-      <div style="font-size:13px;color:#888;margin-bottom:12px;">賭けてからスタート！賭けなくてもOK。</div>
+      <div style="font-size:13px;color:#888;margin-bottom:12px;">参加費 10京円 を払ってペットをレースに出します！</div>
 
       <div style="margin-bottom:10px;">
-        <label style="font-size:13px;font-weight:bold;color:#555;">どのロボットに？</label>
+        <label style="font-size:13px;font-weight:bold;color:#555;">参加ペット</label>
         <select id="prerace-bet-select" style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;"></select>
       </div>
       <div style="margin-bottom:10px;">
-        <label style="font-size:13px;font-weight:bold;color:#555;">賭け金（円）</label>
-        <input id="prerace-bet-amount" type="number" min="30" value="100" oninput="updatePreRaceOdds()"
-          style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;" />
+        <label style="font-size:13px;font-weight:bold;color:#555;">参加費（固定）</label>
+        <input id="prerace-bet-amount" type="text" readonly
+          style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;background:#f5f5f5;color:#888;" />
       </div>
       <div style="background:#f9f9f9;border-radius:12px;padding:10px;margin-bottom:14px;font-size:13px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
@@ -965,10 +965,10 @@
 
       <div style="display:flex;gap:8px;">
         <button onclick="startWithBet(true)" style="flex:2;padding:12px;background:#ffb74d;color:white;border:none;border-radius:14px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 3px 0 #f57c00;">
-          🎯 賭けてスタート！
+          🐾 このままスタート！
         </button>
         <button onclick="startWithBet(false)" style="flex:1;padding:12px;background:#e0e0e0;color:#555;border:none;border-radius:14px;font-size:14px;font-weight:bold;cursor:pointer;">
-          賭けずにスタート
+          キャンセル
         </button>
       </div>
     </div>
@@ -2304,17 +2304,22 @@
     }
 
     function openPreRaceModal() {
-      if (timer) clearInterval(timer);
-      timer = null;
-      currentBet = null;
-      document.getElementById('retry-controls').style.display = 'none';
-      initRace();
+      // ペット賭け専用の確認モーダル
+      const pet = petRaceBetInfo;
+      const typeName = pet ? (PERSONALITIES[pet.type]?.name || pet.type) : '?';
+      // モーダルタイトルとロボ選択肢をペット専用表示に切り替え
+      document.querySelector('#prerace-modal .modal-title span').innerText = '🐾 ペットでレースに参加';
       const sel = document.getElementById('prerace-bet-select');
-      sel.innerHTML = robots.map(r => `<option value="${r.id}">No.${r.id}（${PERSONALITIES[r.type].name}）</option>`).join('');
-      sel.onchange = updatePreRaceOdds;
-      document.getElementById('prerace-bet-amount').value = 100;
+      sel.innerHTML = `<option value="pet">${pet ? pet.name : '?'}（${typeName}）【あなたのペット】</option>`;
+      sel.disabled = true;
+      document.getElementById('prerace-bet-amount').value = formatMoney(PET_RACE_COST);
+      document.getElementById('prerace-bet-amount').disabled = true;
       document.getElementById('prerace-msg').innerText = '';
-      updatePreRaceOdds();
+      // オッズ表示はレース開始後に確定するため仮表示
+      document.getElementById('prerace-odds').innerText = `${pet ? pet.oddsX : 1}x 固定倍率（基本オッズ×${pet ? pet.oddsX : 1}）`;
+      document.getElementById('prerace-bet-disp').innerText = formatMoney(PET_RACE_COST) + ' 円（参加費固定）';
+      document.getElementById('prerace-balance').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('prerace-total-disp').innerText = formatMoney(PET_RACE_COST) + ' 円';
       document.getElementById('prerace-modal').classList.add('open');
     }
 
@@ -2331,25 +2336,23 @@
     }
 
     function startWithBet(doBet) {
-      if (doBet) {
-        const amount = Math.floor(Number(document.getElementById('prerace-bet-amount').value) || 0);
-        if (amount < 30) { document.getElementById('prerace-msg').innerText = '30円以上で賭けてください'; return; }
-        if (amount > playerBalance) { document.getElementById('prerace-msg').innerText = '残高が足りません'; return; }
-        const id = parseInt(document.getElementById('prerace-bet-select').value, 10);
-        const bot = robots.find(r => r.id === id);
-        if (!bot) return;
-        const { oddsDecimal, winProb } = computeOdds(bot);
-        currentBet = { botId: id, amount, odds: oddsDecimal, prob: winProb };
-        playerBalance -= amount;
-        document.getElementById('player-balance').innerText = formatMoney(playerBalance);
-        document.getElementById('bet-msg').innerText = `No.${id} に ${amount}円 賭けました（${oddsDecimal}x）`;
-        saveData();
+      // ペット賭けモーダルから来た場合（doBet=trueはスタート、falseはキャンセル）
+      if (!doBet) {
+        // キャンセル→ペット賭けも取り消し
+        petRaceBetActive = false;
+        petRaceBetInfo = null;
+        closeModal('prerace-modal');
+        // select/inputを元に戻す
+        document.getElementById('prerace-bet-select').disabled = false;
+        document.getElementById('prerace-bet-amount').disabled = false;
+        return;
       }
       closeModal('prerace-modal');
-      lockBetting();
-      document.getElementById('start-controls').style.display = 'none';
-      document.getElementById('retry-controls').style.display = 'none';
-      timer = setInterval(stepAndCheckFinish, 40);
+      // select/inputを元に戻す
+      document.getElementById('prerace-bet-select').disabled = false;
+      document.getElementById('prerace-bet-amount').disabled = false;
+      // start()がペット賭け処理を行う
+      start();
     }
 
     function setBeginnerPick() {
