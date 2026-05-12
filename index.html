@@ -943,6 +943,12 @@
         <input id="prerace-bet-amount" type="text" readonly
           style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;background:#f5f5f5;color:#888;" />
       </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:13px;font-weight:bold;color:#555;">掛け金（円）</label>
+        <input id="prerace-extra-amount" type="number" min="0" value="0" oninput="updatePreRaceOdds()"
+          style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;" />
+        <div style="font-size:11px;color:#aaa;margin-top:3px;">※0円でもレースに参加できます。当たると掛け金×オッズが返ってきます。</div>
+      </div>
       <div style="background:#f9f9f9;border-radius:12px;padding:10px;margin-bottom:14px;font-size:13px;">
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
           <span style="color:#888;">オッズ</span>
@@ -953,11 +959,15 @@
           <span id="prerace-balance" style="font-weight:bold;">- 円</span>
         </div>
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-          <span style="color:#888;">🎰 賭け金</span>
-          <span id="prerace-bet-disp" style="font-weight:bold;color:#333;">- 円</span>
+          <span style="color:#888;">🎟 参加費</span>
+          <span style="font-weight:bold;color:#888;">10京円</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:#888;">🎰 掛け金</span>
+          <span id="prerace-bet-disp" style="font-weight:bold;color:#333;">0 円</span>
         </div>
         <div style="display:flex;justify-content:space-between;border-top:1px dashed #e0e0e0;padding-top:6px;margin-top:2px;">
-          <span style="color:#888;">支払い合計（賭けなしの場合0円）</span>
+          <span style="color:#888;">支払い合計</span>
           <span id="prerace-total-disp" style="font-weight:bold;color:#ef6c00;">- 円</span>
         </div>
       </div>
@@ -2130,18 +2140,33 @@
 
       if (currentBet) {
         stats.totalBets++;
-        const won = currentBet.botId === winner.id;
+        const won = currentBet.isPetBet
+          ? (winner.isPet && winner.id === currentBet.botId)
+          : (currentBet.botId === winner.id);
         let payout = 0;
         if (won) {
-          payout = Math.floor(currentBet.amount * currentBet.odds);
+          // ペット掛け金の場合はレース終了時の実際のオッズで精算
+          const finalOdds = currentBet.isPetBet
+            ? (() => { const pb = robots.find(r => r.id === currentBet.botId); return pb ? computeOdds(pb).oddsDecimal : currentBet.odds; })()
+            : currentBet.odds;
+          payout = Math.floor(currentBet.amount * finalOdds);
           playerBalance += payout;
           stats.wins++;
           stats.totalEarned += payout;
-          showToast(`🎉 的中！ No.${winner.id} が優勝！ +${formatMoney(payout)}円`);
-          showBetMsg(`的中！配当 ${formatMoney(payout)}円 獲得！`);
+          if (currentBet.isPetBet) {
+            showToast(`🐾 掛け金的中！ +${formatMoney(payout)}円（オッズ${finalOdds}x）`);
+            showBetMsg(`掛け金的中！配当 ${formatMoney(payout)}円 獲得！`);
+          } else {
+            showToast(`🎉 的中！ No.${winner.id} が優勝！ +${formatMoney(payout)}円`);
+            showBetMsg(`的中！配当 ${formatMoney(payout)}円 獲得！`);
+          }
         } else {
-          showToast(`😢 外れ… No.${winner.id} が優勝`);
-          showBetMsg(`外れ：No.${winner.id} が勝ちました`);
+          if (currentBet.isPetBet) {
+            showBetMsg(`掛け金外れ…`);
+          } else {
+            showToast(`😢 外れ… No.${winner.id} が優勝`);
+            showBetMsg(`外れ：No.${winner.id} が勝ちました`);
+          }
         }
         betHistory.push({ botId: currentBet.botId, amount: currentBet.amount, win: won, payout });
         if (playerBalance > stats.peakBalance) stats.peakBalance = playerBalance;
@@ -2312,46 +2337,51 @@
       const sel = document.getElementById('prerace-bet-select');
       sel.innerHTML = `<option value="pet">${pet ? pet.name : '?'}（${typeName}）【あなたのペット】</option>`;
       sel.disabled = true;
-      document.getElementById('prerace-bet-amount').value = formatMoney(PET_RACE_COST);
-      document.getElementById('prerace-bet-amount').disabled = true;
+      document.getElementById('prerace-bet-amount').value = formatMoney(PET_RACE_COST) + '円';
+      const extraEl = document.getElementById('prerace-extra-amount');
+      if (extraEl) { extraEl.value = 0; extraEl.disabled = false; }
       document.getElementById('prerace-msg').innerText = '';
-      // オッズ表示はレース開始後に確定するため仮表示
+      // オッズ表示
       document.getElementById('prerace-odds').innerText = `${pet ? pet.oddsX : 1}x 固定倍率（基本オッズ×${pet ? pet.oddsX : 1}）`;
-      document.getElementById('prerace-bet-disp').innerText = formatMoney(PET_RACE_COST) + ' 円（参加費固定）';
+      document.getElementById('prerace-bet-disp').innerText = '0 円';
       document.getElementById('prerace-balance').innerText = formatMoney(playerBalance) + ' 円';
       document.getElementById('prerace-total-disp').innerText = formatMoney(PET_RACE_COST) + ' 円';
       document.getElementById('prerace-modal').classList.add('open');
     }
 
     function updatePreRaceOdds() {
-      const id = parseInt(document.getElementById('prerace-bet-select').value, 10);
-      const bot = robots.find(r => r.id === id);
-      if (!bot) { document.getElementById('prerace-odds').innerText = '-'; return; }
-      const { oddsDecimal, winProb } = computeOdds(bot);
-      document.getElementById('prerace-odds').innerText = `${oddsDecimal}x（勝率 ${Math.round(winProb * 10000) / 100}%）`;
-      const amt = Math.floor(Number(document.getElementById('prerace-bet-amount').value) || 0);
-      document.getElementById('prerace-bet-disp').innerText = formatMoney(amt) + ' 円';
+      const pet = petRaceBetInfo;
+      document.getElementById('prerace-odds').innerText = pet ? `${pet.oddsX}x 固定倍率（基本オッズ×${pet.oddsX}）` : '-';
+      const extra = Math.max(0, Math.floor(Number(document.getElementById('prerace-extra-amount')?.value) || 0));
+      document.getElementById('prerace-bet-disp').innerText = formatMoney(extra) + ' 円';
       document.getElementById('prerace-balance').innerText = formatMoney(playerBalance) + ' 円';
-      document.getElementById('prerace-total-disp').innerText = formatMoney(amt) + ' 円';
+      document.getElementById('prerace-total-disp').innerText = formatMoney(PET_RACE_COST + extra) + ' 円';
     }
 
     function startWithBet(doBet) {
-      // ペット賭けモーダルから来た場合（doBet=trueはスタート、falseはキャンセル）
       if (!doBet) {
-        // キャンセル→ペット賭けも取り消し
         petRaceBetActive = false;
         petRaceBetInfo = null;
         closeModal('prerace-modal');
-        // select/inputを元に戻す
         document.getElementById('prerace-bet-select').disabled = false;
-        document.getElementById('prerace-bet-amount').disabled = false;
         return;
       }
+      // 掛け金があれば通常賭けとして登録
+      const extra = Math.max(0, Math.floor(Number(document.getElementById('prerace-extra-amount')?.value) || 0));
+      if (extra > 0) {
+        if (extra > playerBalance - PET_RACE_COST) {
+          document.getElementById('prerace-msg').innerText = '残高が足りません（参加費10京円＋掛け金）';
+          return;
+        }
+        // 掛け金は通常賭けとして登録（ペット自身に賭ける）
+        // ペットロボのオッズはstart()後に確定するが、ここでは仮登録
+        currentBet = { botId: 'pet_' + petRaceBetInfo.name, amount: extra, odds: petRaceBetInfo.oddsX, isPetBet: true };
+        playerBalance -= extra;
+        document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+        saveData();
+      }
       closeModal('prerace-modal');
-      // select/inputを元に戻す
       document.getElementById('prerace-bet-select').disabled = false;
-      document.getElementById('prerace-bet-amount').disabled = false;
-      // start()がペット賭け処理を行う
       start();
     }
 
