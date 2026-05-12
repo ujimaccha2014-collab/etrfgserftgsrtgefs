@@ -1561,7 +1561,50 @@
     let userId = '';
     let pets = [];
 
+    // localStorageの古いBigInt精度ズレ値を修正するマイグレーション
+    function migrateLocalStorage() {
+      // balanceの修正: ハッシュを無視して生の値を読み、正しい文字列で再保存
+      const rawBal = localStorage.getItem(LS_BALANCE);
+      if (rawBal && /^\d+$/.test(rawBal)) {
+        // 数字文字列として保存されている → Number() で読んで numToStr() で正規化して再保存
+        const n = Number(rawBal);
+        if (!isNaN(n)) {
+          const correct = numToStr(n);
+          if (correct !== rawBal) {
+            // 値がズレていた → 正しい値で上書き（ハッシュも再計算）
+            const h = calcHash(LS_BALANCE + ':' + correct);
+            localStorage.setItem(LS_BALANCE, correct);
+            localStorage.setItem(LS_BALANCE + '_h', h);
+            console.log('[migrate] balance fixed:', rawBal, '->', correct);
+          }
+        }
+      }
+      // statsの修正
+      const rawStats = localStorage.getItem(LS_STATS);
+      if (rawStats) {
+        try {
+          const obj = JSON.parse(rawStats);
+          let changed = false;
+          for (const k in obj) {
+            if (typeof obj[k] === 'string' && /^\d+$/.test(obj[k])) {
+              const n = Number(obj[k]);
+              const correct = numToStr(n);
+              if (correct !== obj[k]) { obj[k] = correct; changed = true; }
+            }
+          }
+          if (changed) {
+            const str = JSON.stringify(obj);
+            const h = calcHash(LS_STATS + ':' + str);
+            localStorage.setItem(LS_STATS, str);
+            localStorage.setItem(LS_STATS + '_h', h);
+            console.log('[migrate] stats fixed');
+          }
+        } catch(e) {}
+      }
+    }
+
     function loadData() {
+      migrateLocalStorage();
       playerBalance = loadBigNum(LS_BALANCE, 1000);
       const defaultName = 'プレイヤー' + (Math.floor(Math.random() * 900) + 100);
       profile = JSON.parse(localStorage.getItem(LS_PROFILE) || `{"name":"${defaultName}","spirit":"よろしく！"}`);
