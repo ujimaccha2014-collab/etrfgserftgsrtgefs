@@ -2502,8 +2502,6 @@
     function appInit() {
       loadData();
       initRace();
-      // 管理者オーバーライドをページ読み込み時にチェック
-      checkAdminOverrides();
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
           document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
@@ -2512,6 +2510,22 @@
       document.querySelectorAll('.modal-overlay').forEach(m => {
         m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
       });
+      // Firebase module は type="module" のため body onload より遅れて初期化される。
+      // _fbGetAdminOverride が準備できるまで最大3秒待ってからチェックする。
+      waitForFirebaseThenCheck();
+    }
+
+    function waitForFirebaseThenCheck() {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        if (typeof window._fbGetAdminOverride === 'function') {
+          clearInterval(interval);
+          checkAdminOverrides();
+        } else if (Date.now() - start > 3000) {
+          clearInterval(interval);
+          console.warn('[admin] Firebase未初期化のためBANチェックをスキップしました');
+        }
+      }, 50);
     }
 
     window.filterRobots = filterRobots;
