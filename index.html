@@ -915,7 +915,7 @@
 
   <!-- コントロールボタン -->
   <div class="controls" id="start-controls">
-    <button class="start-btn" onclick="openPreRaceModal()">🏁 出発！</button>
+    <button class="start-btn" onclick="petRaceBetActive ? openPreRaceModal() : start()">🏁 出発！</button>
     <button onclick="resetRace()" style="background:none;border:none;color:#999;cursor:pointer;">はじめからやり直す</button>
   </div>
 
@@ -1802,11 +1802,14 @@
     }
 
     function renderRanking() {
-      const list = Object.entries(rankingData).map(([id, d]) => ({ id, ...d }));
+      // BAN中ユーザーを除外（bannedフラグがある場合）
+      const list = Object.entries(rankingData)
+        .filter(([id, d]) => !d.banned)
+        .map(([id, d]) => ({ id, ...d }));
       const medals = ['🥇','🥈','🥉'];
       if (currentRankTab === 'balance') {
         list.sort((a, b) => b.balance - a.balance);
-        document.getElementById('ranking-list').innerHTML = list.slice(0, 20).map((u, i) => `
+        document.getElementById('ranking-list').innerHTML = list.slice(0, 5).map((u, i) => `
           <div class="ranking-row" onclick="openOtherProfile('${u.id}')" style="cursor:pointer;${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
             <span class="ranking-medal">${medals[i] || (i+1) + '.'}</span>
             <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#f57c00">（あなた）</small>' : ''}</span>
@@ -1822,7 +1825,7 @@
           document.getElementById('ranking-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;font-size:13px;">3回以上賭けたプレイヤーがいません</div>';
           return;
         }
-        document.getElementById('ranking-list').innerHTML = filtered.slice(0, 20).map((u, i) => `
+        document.getElementById('ranking-list').innerHTML = filtered.slice(0, 5).map((u, i) => `
           <div class="ranking-row" onclick="openOtherProfile('${u.id}')" style="cursor:pointer;${u.id === userId ? 'background:#fffde7;border-radius:8px;padding:8px;' : ''}">
             <span class="ranking-medal">${medals[i] || (i+1) + '.'}</span>
             <span class="ranking-name">${escHtml(u.name)} ${u.id === userId ? '<small style="color:#f57c00">（あなた）</small>' : ''}</span>
@@ -2018,9 +2021,10 @@
     function initBetUI() {
       const sel = document.getElementById('bet-select');
       sel.innerHTML = '';
-      for (let i = 1; i <= 100; i++) {
-        sel.insertAdjacentHTML('beforeend', `<option value="${i}">No.${i}</option>`);
-      }
+      robots.filter(r => !r.isPet).forEach(r => {
+        const typeName = PERSONALITIES[r.type]?.name || r.type;
+        sel.insertAdjacentHTML('beforeend', `<option value="${r.id}">No.${r.id}（${typeName}）</option>`);
+      });
       document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       document.getElementById('place-bet').onclick = placeBet;
       document.getElementById('cancel-bet').onclick = cancelBet;
@@ -2041,7 +2045,11 @@
         return s + r.baseSpeed * pf * sf * pb;
       }, 0.0001);
       const winProb = Math.max(0.0005, baseScore / total);
-      const oddsDecimal = Math.max(1.1, Math.round((1 / winProb) * 10) / 10);
+      let oddsDecimal = Math.max(1.1, Math.round((1 / winProb) * 10) / 10);
+      // ペットの場合はoddsX固定倍率を掛ける
+      if (bot.isPet && bot.petOddsX) {
+        oddsDecimal = Math.round(oddsDecimal * bot.petOddsX * 10) / 10;
+      }
       return { oddsDecimal, winProb };
     }
 
@@ -2092,22 +2100,12 @@
       // ペット賭けの精算（実際のレース結果で判定）
       if (petRaceBetActive && petRaceBetInfo) {
         const pet = petRaceBetInfo;
-        // ペットのスピードをロボに変換してオッズ計算
-        const petSpd = 3 + (pet.spd / 100) * 30;
-        const petStmVal = 700 + (pet.stm / 100) * 1000;
-        const posFactor = 1;
-        const sfVal = 0.5 + 1.2;
-        const pb = {dash:1.15,climb:1.08,lucky:1.05,tough:1.03}[pet.type] || 1.0;
-        const baseScore = petSpd * posFactor * sfVal * pb;
-        const total = filteredRobots.reduce((s, r) => {
-          const pf = 1 + (r.x / goalPx);
-          const sf = 0.5 + (r.energy / r.maxEnergy) * 1.2;
-          const pb2 = {dash:1.15,climb:1.08,lucky:1.05,tough:1.03}[r.type] || 1.0;
-          return s + r.baseSpeed * pf * sf * pb2;
-        }, 0.0001);
-        const winProb = Math.max(0.0005, baseScore / total);
-        const baseOdds = Math.max(1.1, Math.round((1 / winProb) * 10) / 10);
-        const finalOdds = Math.round(baseOdds * pet.oddsX * 10) / 10;
+        // ペットロボットオブジェクトを取得してcomputeOddsで正確なオッズを計算
+        const petBot = robots.find(r => r.id === 'pet_' + pet.name);
+        let finalOdds = 1.1;
+        if (petBot) {
+          finalOdds = computeOdds(petBot).oddsDecimal;
+        }
 
         // 実際にペットロボットが1位なら勝ち
         const petWon = winner.isPet && winner.id === 'pet_' + pet.name;
@@ -2257,6 +2255,7 @@
               isPet: true,
               petName: pet.name,
               petBorder: pet.border || false,
+              petOddsX: pet.oddsX || 1,
               el: petEl,
               x: 0,
               color: pet.color || '#ff8a65',
