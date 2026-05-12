@@ -665,6 +665,31 @@
     #pet-race-btn   { background:#81c784; color:white; box-shadow:0 3px 0 #388e3c; }
     #pet-race-btn:hover { background:#66bb6a; }
 
+    /* ===== PET VISUAL EDITOR ===== */
+    #pet-visual-editor { display: flex; gap: 10px; align-items: flex-start; }
+    #pve-canvas-wrap { position: relative; flex-shrink: 0; }
+    #pve-canvas { border: 2px dashed #ccc; border-radius: 12px; background: repeating-conic-gradient(#f0f0f0 0% 25%, #fafafa 0% 50%) 0 0 / 10px 10px; cursor: crosshair; touch-action: none; display: block; }
+    #pve-hint { text-align: center; font-size: 10px; color: #bbb; margin-top: 3px; }
+    #pve-controls { flex: 1; min-width: 0; font-size: 12px; }
+    .pve-section-label { font-weight: bold; color: #888; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    #pve-add-row { display: flex; gap: 4px; margin-bottom: 4px; }
+    .pve-add-btn { flex: 1; padding: 6px 4px; border: 2px solid #e0e0e0; border-radius: 8px; background: #fff; cursor: pointer; font-size: 12px; font-weight: bold; color: #555; transition: all 0.15s; }
+    .pve-add-btn:hover { background: #f3f3f3; border-color: #aed581; }
+    #pve-props { background: #fafafa; border-radius: 8px; padding: 8px; border: 1px solid #eee; margin-top: 6px; }
+    .pve-prop-row { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .pve-prop-row label { width: 36px; font-size: 11px; color: #666; flex-shrink: 0; }
+    .pve-prop-row input[type="range"] { flex: 1; min-width: 0; }
+    .pve-prop-row input[type="color"] { width: 36px; height: 24px; border: none; border-radius: 4px; cursor: pointer; padding: 0; }    .pve-prop-row span { font-size: 11px; color: #888; width: 34px; text-align: right; flex-shrink: 0; }
+    .pve-del-btn { width: 100%; padding: 5px; background: #fff0f0; border: 1px solid #ffcdd2; border-radius: 6px; color: #e53935; font-size: 11px; cursor: pointer; margin-top: 4px; }
+    .pve-del-btn:hover { background: #ffebee; }
+    #pve-part-list { max-height: 80px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; margin-bottom: 4px; }
+    .pve-part-item { display: flex; align-items: center; gap: 5px; padding: 3px 6px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; font-size: 11px; color: #555; transition: background 0.1s; }
+    .pve-part-item:hover { background: #f0f0f0; }
+    .pve-part-item.selected { background: #fff9c4; border-color: #ffd54f; }
+    .pve-part-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; border: 1px solid #ccc; }
+    .pve-clear-btn { width: 100%; padding: 4px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; font-size: 11px; color: #888; cursor: pointer; }
+    .pve-clear-btn:hover { background: #eee; }
+
     /* ===== PET EDITOR ===== */
     #pet-editor {
       display: none;
@@ -1227,6 +1252,55 @@
         <button class="close-btn" onclick="closePetEditor()">✕</button>
       </div>
 
+      <!-- 見た目エディター -->
+      <div class="pet-editor-row" id="pve-row" style="display:none;">
+        <div class="pet-editor-label">🎨 見た目エディター <span class="cost-tag">（無料）</span></div>
+        <div id="pet-visual-editor">
+          <!-- キャンバス -->
+          <div id="pve-canvas-wrap">
+            <canvas id="pve-canvas" width="200" height="200"></canvas>
+            <div id="pve-hint">パーツをドラッグして動かせます</div>
+          </div>
+          <!-- パーツ追加 -->
+          <div id="pve-controls">
+            <div class="pve-section-label">パーツを追加</div>
+            <div id="pve-add-row">
+              <button class="pve-add-btn" onclick="pveAddPart('circle')">● 丸</button>
+              <button class="pve-add-btn" onclick="pveAddPart('rect')">■ 四角</button>
+              <button class="pve-add-btn" onclick="pveAddPart('triangle')">▲ 三角</button>
+            </div>
+            <!-- 選択中パーツのプロパティ -->
+            <div id="pve-props" style="display:none;">
+              <div class="pve-section-label" style="margin-top:8px;">選択中パーツ</div>
+              <div class="pve-prop-row">
+                <label>色</label>
+                <input type="color" id="pve-color" oninput="pveUpdateSelected()">
+              </div>
+              <div class="pve-prop-row">
+                <label>大きさ</label>
+                <input type="range" id="pve-size" min="8" max="80" value="30" oninput="pveUpdateSelected()">
+                <span id="pve-size-val">30</span>
+              </div>
+              <div class="pve-prop-row">
+                <label>回転</label>
+                <input type="range" id="pve-rot" min="0" max="360" value="0" oninput="pveUpdateSelected()">
+                <span id="pve-rot-val">0°</span>
+              </div>
+              <div class="pve-prop-row">
+                <label>透明度</label>
+                <input type="range" id="pve-alpha" min="10" max="100" value="100" oninput="pveUpdateSelected()">
+                <span id="pve-alpha-val">100%</span>
+              </div>
+              <button class="pve-del-btn" onclick="pveDeleteSelected()">🗑 このパーツを削除</button>
+            </div>
+            <!-- パーツ一覧 -->
+            <div class="pve-section-label" style="margin-top:8px;">パーツ一覧 <span id="pve-count" style="font-size:11px;color:#aaa;"></span></div>
+            <div id="pve-part-list"></div>
+            <button class="pve-clear-btn" onclick="pveClearAll()">🗑 全消去</button>
+          </div>
+        </div>
+      </div>
+
       <!-- 名前 -->
       <div class="pet-editor-row">
         <div class="pet-editor-label">ペット名 <span class="cost-tag">（名前変更無料）</span></div>
@@ -1355,7 +1429,7 @@
         await set(ref(db, 'ranking/' + userId), {
           name: name || 'プレイヤー',
           spirit: spirit || '',
-          balance: numToStr(balance),
+          balance: balance,
           totalBets: totalBets,
           wins: wins,
           winRate: winRate,
@@ -1682,12 +1756,6 @@
       document.getElementById('ranking-list').innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">読み込み中...</div>';
       const fbData = await (typeof window._fbGetRanking === 'function' ? window._fbGetRanking() : Promise.resolve(null));
       if (fbData) {
-        // balanceが文字列で保存されている場合はNumberに戻す（精度ズレ防止）
-        for (const uid in fbData) {
-          if (typeof fbData[uid].balance === 'string') {
-            fbData[uid].balance = Number(fbData[uid].balance);
-          }
-        }
         rankingData = fbData;
         rankingData[userId] = {
           name: profile.name,
@@ -1915,9 +1983,9 @@
         const ab = document.getElementById('btn-' + target.id);
         if (ab) ab.classList.add('active');
         winEl.scrollLeft = Math.max(0, target.x - (window.innerWidth / 2));
-        document.getElementById('mon-name').innerText = "No." + target.id;
+        document.getElementById('mon-name').innerText = target.isPet ? '🐾 ' + target.petName : "No." + target.id;
         document.getElementById('mon-name').style.color = target.color;
-        document.getElementById('mon-type-tag').innerText = "タイプ：" + PERSONALITIES[target.type].name;
+        document.getElementById('mon-type-tag').innerText = "タイプ：" + (PERSONALITIES[target.type]?.name || target.type);
         document.getElementById('mon-dist').innerText = Math.floor(target.x / 10);
         document.getElementById('mon-desc').innerText = PERSONALITIES[target.type].desc;
         document.getElementById('mon-stat-spd').innerText = target.statSpd;
@@ -2007,7 +2075,7 @@
       const winner = 終わり[0];
       if (!winner) return;
 
-      // ペット賭けの精算
+      // ペット賭けの精算（実際のレース結果で判定）
       if (petRaceBetActive && petRaceBetInfo) {
         const pet = petRaceBetInfo;
         // ペットのスピードをロボに変換してオッズ計算
@@ -2027,15 +2095,19 @@
         const baseOdds = Math.max(1.1, Math.round((1 / winProb) * 10) / 10);
         const finalOdds = Math.round(baseOdds * pet.oddsX * 10) / 10;
 
-        // ペットは「ランダムに勝敗」：勝率に基づいて判定
-        const petWon = Math.random() < winProb;
+        // 実際にペットロボットが1位なら勝ち
+        const petWon = winner.isPet && winner.id === 'pet_' + pet.name;
+        stats.totalBets++;
         if (petWon) {
           const payout = Math.floor(PET_RACE_COST * finalOdds);
           playerBalance += payout;
-          showToast(`🐾 ${pet.name} 勝利！ +${formatMoney(payout)}円（オッズ${finalOdds}x）`);
+          stats.wins++;
           stats.totalEarned += payout;
+          showToast(`🐾 ${pet.name} 勝利！ +${formatMoney(payout)}円（オッズ${finalOdds}x）`);
+          showBetMsg(`🐾 的中！配当 ${formatMoney(payout)}円 獲得！`);
         } else {
           showToast(`🐾 ${pet.name} 敗北…`);
+          showBetMsg(`🐾 ${pet.name} は負けました`);
         }
         if (playerBalance > stats.peakBalance) stats.peakBalance = playerBalance;
         document.getElementById('player-balance').innerText = formatMoney(playerBalance);
@@ -2119,8 +2191,20 @@
       filteredRobots.forEach(r => {
         const btn = document.createElement('button');
         btn.className = 'bot-btn' + (targetId === r.id ? ' active' : '');
-        btn.innerText = r.id;
-        btn.style.background = r.color;
+        if (r.isPet && r.parts && r.parts.length > 0) {
+          btn.innerHTML = renderPetSvg(r.parts, 24);
+          btn.style.background = 'white';
+          btn.style.border = '2px solid ' + r.color;
+          btn.style.fontSize = '0';
+        } else if (r.isPet) {
+          btn.innerText = '🐾';
+          btn.style.background = r.color;
+          btn.style.fontSize = '14px';
+        } else {
+          btn.innerText = r.id;
+          btn.style.background = r.color;
+        }
+        btn.title = r.isPet ? r.petName : 'No.' + r.id;
         btn.id = 'btn-' + r.id;
         btn.onclick = () => { targetId = r.id; updateUI(); };
         grid.appendChild(btn);
@@ -2129,7 +2213,7 @@
 
     function start() {
       if (!timer) {
-        // ペット賭けが有効なら参加費を引く
+        // ペット賭けが有効なら参加費を引いてロボットとして追加
         if (petRaceBetActive && petRaceBetInfo) {
           if (playerBalance < PET_RACE_COST) {
             showToast('ペット参加費（10京円）が足りません。キャンセルします');
@@ -2138,7 +2222,40 @@
             playerBalance -= PET_RACE_COST;
             document.getElementById('player-balance').innerText = formatMoney(playerBalance);
             saveData();
-            showBetMsg(`🐾 ${petRaceBetInfo.name} で参加！（10京円）`);
+            const pet = petRaceBetInfo;
+            const petSpd = 3 + (pet.spd / 100) * 5;
+            const petStm = 700 + (pet.stm / 100) * 1000;
+            const petEl = document.createElement('div');
+            petEl.className = 'robot';
+            petEl.style.cssText = 'position:absolute;width:42px;height:42px;border-radius:6px;border:3px solid ' + (pet.color || '#ff8a65') + ';display:flex;align-items:center;justify-content:center;overflow:hidden;background:white;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+            petEl.style.top = Math.random() * (track.offsetHeight - 60) + 10 + 'px';
+            petEl.style.left = '0px';
+            petEl.title = pet.name;
+            if (pet.parts && pet.parts.length > 0) {
+              petEl.innerHTML = renderPetSvg(pet.parts, 36);
+            } else {
+              petEl.style.fontSize = '20px';
+              petEl.innerText = '🐾';
+            }
+            track.appendChild(petEl);
+            const petRobot = {
+              id: 'pet_' + pet.name,
+              isPet: true,
+              petName: pet.name,
+              el: petEl,
+              x: 0,
+              color: pet.color || '#ff8a65',
+              type: pet.type || 'relax',
+              maxEnergy: petStm,
+              energy: petStm,
+              baseSpeed: petSpd,
+              done: false,
+              statSpd: getStars(petSpd, 3, 8),
+              statStm: getStars(petStm, 700, 1700)
+            };
+            robots.push(petRobot);
+            filteredRobots.push(petRobot);
+            showBetMsg(`🐾 ${pet.name} で参加！（10京円）`);
           }
         }
         lockBetting();
@@ -2289,6 +2406,28 @@
       selectedPetIdx = -1;
     }
 
+
+    function renderPetSvg(parts, size=48) {
+      if (!parts || parts.length === 0) return '<span style="font-size:' + (size*0.6) + 'px;">🐾</span>';
+      const scale = size / 200;
+      const shapes = parts.map(p => {
+        const tx = p.x * scale, ty = p.y * scale, s = p.size * scale;
+        const rot = p.rot || 0;
+        const alpha = (p.alpha || 100) / 100;
+        let shape = '';
+        if (p.shape === 'circle') {
+          shape = '<circle cx="0" cy="0" r="' + (s/2) + '" fill="' + p.color + '" opacity="' + alpha + '"/>';
+        } else if (p.shape === 'rect') {
+          shape = '<rect x="' + (-s/2) + '" y="' + (-s/2) + '" width="' + s + '" height="' + s + '" fill="' + p.color + '" opacity="' + alpha + '"/>';
+        } else if (p.shape === 'triangle') {
+          const pts = '0,' + (-s/2) + ' ' + (s/2) + ',' + (s/2) + ' ' + (-s/2) + ',' + (s/2);
+          shape = '<polygon points="' + pts + '" fill="' + p.color + '" opacity="' + alpha + '"/>';
+        }
+        return '<g transform="translate(' + tx + ',' + ty + ') rotate(' + rot + ')">' + shape + '</g>';
+      }).join('');
+      return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">' + shapes + '</svg>';
+    }
+
     function renderPetList() {
       const area = document.getElementById('pet-list-area');
       const empty = document.getElementById('pet-empty-msg');
@@ -2301,13 +2440,17 @@
           const card = document.createElement('div');
           card.className = 'pet-card' + (selectedPetIdx === i ? ' selected' : '');
           card.innerHTML = `
-            <div class="pet-card-name" style="color:${p.color}">${escHtml(p.name)}</div>
-            <div class="pet-card-type">${PERSONALITIES[p.type]?.name || p.type}</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <div style="flex-shrink:0;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:#f5f5f5;border-radius:8px;overflow:hidden;">${renderPetSvg(p.parts, 48)}</div>
+              <div>
+                <div class="pet-card-name" style="color:${p.color}">${escHtml(p.name)}</div>
+                <div class="pet-card-type">${PERSONALITIES[p.type]?.name || p.type}</div>
+              </div>
+            </div>
             <div class="pet-card-stats">
               ⚡ はやさ: ${petStars(p.spd)} (${p.spd})<br>
               💪 スタミナ: ${petStars(p.stm)} (${p.stm})<br>
-              🎯 オッズ倍率: ${p.oddsX}x<br>
-              🎨 色: <span style="display:inline-block;width:14px;height:14px;background:${p.color};border-radius:3px;vertical-align:middle;border:1px solid #ccc;"></span>
+              🎯 オッズ倍率: ${p.oddsX}x
             </div>`;
           card.onclick = () => {
             selectedPetIdx = i;
@@ -2366,7 +2509,22 @@
 
       document.getElementById('pet-editor-msg').innerText = '';
       updatePetCost();
+      // ビジュアルエディターはペット作成時のみ表示
+      document.getElementById('pve-row').style.display = !isEdit ? '' : 'none';
       document.getElementById('pet-editor').classList.add('open');
+      if (!isEdit) {
+        setTimeout(() => {
+          pveInitEvents();
+          pveParts = []; pveSelected = -1;
+          pveRefreshUI(); pveDraw();
+        }, 50);
+      } else if (isEdit && selectedPetIdx >= 0) {
+        // 編集モードでもパーツデータは保持
+        setTimeout(() => {
+          pveInitEvents();
+          pveLoadFromPet(pets[selectedPetIdx]);
+        }, 50);
+      }
     }
 
     function closePetEditor() {
@@ -2428,7 +2586,7 @@
       if (petEditorMode === 'create') {
         if (playerBalance < c.total) { document.getElementById('pet-editor-msg').innerText = '残高が足りません'; return; }
         playerBalance -= c.total;
-        pets.push({ name, type, spd, stm, oddsX, color });
+        pets.push({ name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)) });
         showToast(`🐾 ${name} を作成しました！`);
       } else {
         const oldP = pets[selectedPetIdx];
@@ -2436,7 +2594,7 @@
         const diff = c.total - oldC.total;
         if (diff > 0 && playerBalance < diff) { document.getElementById('pet-editor-msg').innerText = '追加費用が足りません'; return; }
         playerBalance -= diff;
-        pets[selectedPetIdx] = { name, type, spd, stm, oddsX, color };
+        pets[selectedPetIdx] = { name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)) };
         showToast(`✏️ ${name} を更新しました！`);
       }
 
@@ -2461,6 +2619,210 @@
       petRaceBetInfo   = { ...pet };
       showToast(`🐾 ${pet.name} で次のレースに参加！（10京円）`);
     }
+
+    // ===== PET VISUAL EDITOR (PVE) =====
+    let pveParts = [];
+    let pveSelected = -1;
+    let pveDragMode  = null; // 'move' | 'resize'
+    let pveDragOffX  = 0, pveDragOffY = 0;
+    let pveDragStartSize = 0;
+    let pveDragStartMX = 0, pveDragStartMY = 0;
+    const PVE_W = 200, PVE_H = 200;
+    const HANDLE_R = 7; // resize handle radius in canvas px
+
+    function pveCanvas() { return document.getElementById('pve-canvas'); }
+    function pveCtx()    { return pveCanvas().getContext('2d'); }
+
+    function pveDraw() {
+      const cv = pveCanvas(); if (!cv) return;
+      const ctx = pveCtx();
+      ctx.clearRect(0, 0, PVE_W, PVE_H);
+      pveParts.forEach((p, i) => {
+        ctx.save();
+        ctx.globalAlpha = (p.alpha || 100) / 100;
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot || 0) * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        const s = p.size;
+        if (p.shape === 'circle') {
+          ctx.beginPath(); ctx.arc(0, 0, s/2, 0, Math.PI*2); ctx.fill();
+        } else if (p.shape === 'rect') {
+          ctx.fillRect(-s/2, -s/2, s, s);
+        } else if (p.shape === 'triangle') {
+          ctx.beginPath();
+          ctx.moveTo(0, -s/2); ctx.lineTo(s/2, s/2); ctx.lineTo(-s/2, s/2);
+          ctx.closePath(); ctx.fill();
+        }
+        ctx.restore();
+        // selection outline + resize handle (unrotated for simplicity)
+        if (i === pveSelected) {
+          const r = s/2 + 4;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.strokeStyle = '#ff8a65';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 3]);
+          ctx.strokeRect(-r, -r, r*2, r*2);
+          ctx.setLineDash([]);
+          // resize handle (bottom-right)
+          ctx.fillStyle = '#ff8a65';
+          ctx.beginPath(); ctx.arc(r, r, HANDLE_R, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = 'white';
+          ctx.font = 'bold 8px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('↔', r, r);
+          ctx.restore();
+        }
+      });
+    }
+
+    function pveGetPos(e, cv) {
+      const rect = cv.getBoundingClientRect();
+      const scaleX = PVE_W / rect.width, scaleY = PVE_H / rect.height;
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY };
+    }
+
+    function pveHitHandle(mx, my) {
+      if (pveSelected < 0 || pveSelected >= pveParts.length) return false;
+      const p = pveParts[pveSelected];
+      const r = p.size/2 + 4;
+      const hx = p.x + r, hy = p.y + r;
+      return Math.hypot(mx - hx, my - hy) <= HANDLE_R + 2;
+    }
+
+    function pveHitPart(mx, my) {
+      for (let i = pveParts.length - 1; i >= 0; i--) {
+        const p = pveParts[i];
+        const r = p.size/2 + 6;
+        if (Math.abs(mx - p.x) < r && Math.abs(my - p.y) < r) return i;
+      }
+      return -1;
+    }
+
+    function pveInitEvents() {
+      const cv = pveCanvas(); if (!cv || cv._pveInited) return;
+      cv._pveInited = true;
+
+      cv.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        const {x, y} = pveGetPos(e, cv);
+        if (pveHitHandle(x, y)) {
+          pveDragMode = 'resize';
+          pveDragStartSize = pveParts[pveSelected].size;
+          pveDragStartMX = x; pveDragStartMY = y;
+          cv.setPointerCapture(e.pointerId);
+        } else {
+          const hit = pveHitPart(x, y);
+          if (hit >= 0) {
+            pveSelected = hit;
+            pveDragMode = 'move';
+            pveDragOffX = x - pveParts[hit].x;
+            pveDragOffY = y - pveParts[hit].y;
+            cv.setPointerCapture(e.pointerId);
+          } else {
+            pveSelected = -1;
+            pveDragMode = null;
+          }
+        }
+        pveRefreshUI(); pveDraw();
+      });
+
+      cv.addEventListener('pointermove', e => {
+        if (!pveDragMode || pveSelected < 0) return;
+        e.preventDefault();
+        const {x, y} = pveGetPos(e, cv);
+        if (pveDragMode === 'move') {
+          pveParts[pveSelected].x = Math.max(0, Math.min(PVE_W, x - pveDragOffX));
+          pveParts[pveSelected].y = Math.max(0, Math.min(PVE_H, y - pveDragOffY));
+        } else if (pveDragMode === 'resize') {
+          const dist = Math.hypot(x - pveDragStartMX, y - pveDragStartMY);
+          const sign = (x - pveDragStartMX) + (y - pveDragStartMY) >= 0 ? 1 : -1;
+          pveParts[pveSelected].size = Math.max(8, Math.min(100, pveDragStartSize + sign * dist));
+        }
+        pveRefreshUI(); pveDraw();
+      });
+
+      cv.addEventListener('pointerup', () => { pveDragMode = null; });
+      cv.addEventListener('pointercancel', () => { pveDragMode = null; });
+    }
+
+    function pveAddPart(shape) {
+      pveParts.push({ shape, x: PVE_W/2, y: PVE_H/2, size: 30, color: '#81d4fa', rot: 0, alpha: 100 });
+      pveSelected = pveParts.length - 1;
+      pveRefreshUI(); pveDraw();
+    }
+
+    function pveRefreshUI() {
+      const props = document.getElementById('pve-props');
+      const list  = document.getElementById('pve-part-list');
+      const count = document.getElementById('pve-count');
+      if (!props) return;
+      count.innerText = pveParts.length + '個';
+      if (pveSelected >= 0 && pveSelected < pveParts.length) {
+        const p = pveParts[pveSelected];
+        props.style.display = 'block';
+        document.getElementById('pve-color').value = p.color;
+        document.getElementById('pve-size').value  = p.size;
+        document.getElementById('pve-rot').value   = p.rot;
+        document.getElementById('pve-alpha').value = p.alpha;
+        document.getElementById('pve-size-val').innerText  = Math.round(p.size);
+        document.getElementById('pve-rot-val').innerText   = (p.rot || 0) + '°';
+        document.getElementById('pve-alpha-val').innerText = (p.alpha || 100) + '%';
+      } else {
+        props.style.display = 'none';
+      }
+      if (!list) return;
+      list.innerHTML = '';
+      const shapeLabel = { circle:'●丸', rect:'■四角', triangle:'▲三角' };
+      pveParts.forEach((p, i) => {
+        const el = document.createElement('div');
+        el.className = 'pve-part-item' + (i === pveSelected ? ' selected' : '');
+        el.innerHTML = '<div class="pve-part-swatch" style="background:' + p.color + '"></div>' + (shapeLabel[p.shape]||p.shape) + ' (sz:' + Math.round(p.size) + ')';
+        el.onclick = () => { pveSelected = i; pveRefreshUI(); pveDraw(); };
+        list.appendChild(el);
+      });
+    }
+
+    function pveUpdateSelected() {
+      if (pveSelected < 0 || pveSelected >= pveParts.length) return;
+      const p = pveParts[pveSelected];
+      p.color = document.getElementById('pve-color').value;
+      p.size  = parseInt(document.getElementById('pve-size').value);
+      p.rot   = parseInt(document.getElementById('pve-rot').value);
+      p.alpha = parseInt(document.getElementById('pve-alpha').value);
+      document.getElementById('pve-size-val').innerText  = p.size;
+      document.getElementById('pve-rot-val').innerText   = (p.rot || 0) + '°';
+      document.getElementById('pve-alpha-val').innerText = (p.alpha || 100) + '%';
+      pveRefreshUI(); pveDraw();
+    }
+
+    function pveDeleteSelected() {
+      if (pveSelected < 0) return;
+      pveParts.splice(pveSelected, 1);
+      pveSelected = Math.min(pveSelected, pveParts.length - 1);
+      pveRefreshUI(); pveDraw();
+    }
+
+    function pveClearAll() {
+      if (!confirm('全パーツを削除しますか？')) return;
+      pveParts = []; pveSelected = -1;
+      pveRefreshUI(); pveDraw();
+    }
+
+    function pveLoadFromPet(pet) {
+      pveParts = pet.parts ? JSON.parse(JSON.stringify(pet.parts)) : [];
+      pveSelected = -1;
+      pveRefreshUI(); pveDraw();
+    }
+
+    window.pveAddPart = pveAddPart;
+    window.pveUpdateSelected = pveUpdateSelected;
+    window.pveDeleteSelected = pveDeleteSelected;
+    window.pveClearAll = pveClearAll;
+
+    window.renderPetSvg = renderPetSvg;
     window.openPetScreen = openPetScreen;
     window.closePetScreen = closePetScreen;
     window.openPetEditor = openPetEditor;
