@@ -1368,7 +1368,7 @@
       <div class="pet-editor-row">
         <div class="pet-editor-label">🎯 オッズ固定倍率 <span class="cost-tag" id="pet-odds-cost-label"></span></div>
         <div class="pet-stat-row">
-          <input type="range" id="pet-odds-range" min="1" max="50" value="1" step="0.5" oninput="updatePetCost()">
+          <input type="range" id="pet-odds-range" min="1" max="1000" value="1" step="1" oninput="updatePetCost()">
           <span class="pet-stat-val" id="pet-odds-val">1</span>
           <span style="font-size:13px;color:#888;">x</span>
         </div>
@@ -2110,26 +2110,33 @@
       // ペット賭けの精算（実際のレース結果で判定）
       if (petRaceBetActive && petRaceBetInfo) {
         const pet = petRaceBetInfo;
-        // ペットロボットオブジェクトを取得してcomputeOddsで正確なオッズを計算
         const petBot = robots.find(r => r.id === 'pet_' + pet.name);
         let finalOdds = 1.1;
-        if (petBot) {
-          finalOdds = computeOdds(petBot).oddsDecimal;
-        }
+        if (petBot) finalOdds = computeOdds(petBot).oddsDecimal;
 
-        // 実際にペットロボットが1位なら勝ち
         const petWon = winner.isPet && winner.id === 'pet_' + pet.name;
         stats.totalBets++;
         if (petWon) {
-          const payout = Math.floor(PET_RACE_COST * finalOdds);
+          // 配当 = 掛け金×オッズのみ（参加費は返還しない）
+          const extraBet = (currentBet && currentBet.isPetBet) ? currentBet.amount : 0;
+          const payout = Math.floor(extraBet * finalOdds);
           playerBalance += payout;
           stats.wins++;
           stats.totalEarned += payout;
-          showToast(`🐾 ${pet.name} 勝利！ +${formatMoney(payout)}円（オッズ${finalOdds}x）`);
+          showToast(`🐾 ${pet.name} 勝利！ +${formatMoney(payout)}円（掛け金×${finalOdds}x）`);
           showBetMsg(`🐾 的中！配当 ${formatMoney(payout)}円 獲得！`);
+          // 掛け金はペット精算で処理済みなのでcurrentBetをクリア
+          if (currentBet && currentBet.isPetBet) {
+            betHistory.push({ botId: currentBet.botId, amount: currentBet.amount, win: true, payout });
+            currentBet = null;
+          }
         } else {
           showToast(`🐾 ${pet.name} 敗北…`);
           showBetMsg(`🐾 ${pet.name} は負けました`);
+          if (currentBet && currentBet.isPetBet) {
+            betHistory.push({ botId: currentBet.botId, amount: currentBet.amount, win: false, payout: 0 });
+            currentBet = null;
+          }
         }
         if (playerBalance > stats.peakBalance) stats.peakBalance = playerBalance;
         document.getElementById('player-balance').innerText = formatMoney(playerBalance);
@@ -2140,33 +2147,18 @@
 
       if (currentBet) {
         stats.totalBets++;
-        const won = currentBet.isPetBet
-          ? (winner.isPet && winner.id === currentBet.botId)
-          : (currentBet.botId === winner.id);
+        const won = currentBet.botId === winner.id;
         let payout = 0;
         if (won) {
-          // ペット掛け金の場合はレース終了時の実際のオッズで精算
-          const finalOdds = currentBet.isPetBet
-            ? (() => { const pb = robots.find(r => r.id === currentBet.botId); return pb ? computeOdds(pb).oddsDecimal : currentBet.odds; })()
-            : currentBet.odds;
-          payout = Math.floor(currentBet.amount * finalOdds);
+          payout = Math.floor(currentBet.amount * currentBet.odds);
           playerBalance += payout;
           stats.wins++;
           stats.totalEarned += payout;
-          if (currentBet.isPetBet) {
-            showToast(`🐾 掛け金的中！ +${formatMoney(payout)}円（オッズ${finalOdds}x）`);
-            showBetMsg(`掛け金的中！配当 ${formatMoney(payout)}円 獲得！`);
-          } else {
-            showToast(`🎉 的中！ No.${winner.id} が優勝！ +${formatMoney(payout)}円`);
-            showBetMsg(`的中！配当 ${formatMoney(payout)}円 獲得！`);
-          }
+          showToast(`🎉 的中！ No.${winner.id} が優勝！ +${formatMoney(payout)}円`);
+          showBetMsg(`的中！配当 ${formatMoney(payout)}円 獲得！`);
         } else {
-          if (currentBet.isPetBet) {
-            showBetMsg(`掛け金外れ…`);
-          } else {
-            showToast(`😢 外れ… No.${winner.id} が優勝`);
-            showBetMsg(`外れ：No.${winner.id} が勝ちました`);
-          }
+          showToast(`😢 外れ… No.${winner.id} が優勝`);
+          showBetMsg(`外れ：No.${winner.id} が勝ちました`);
         }
         betHistory.push({ botId: currentBet.botId, amount: currentBet.amount, win: won, payout });
         if (playerBalance > stats.peakBalance) stats.peakBalance = playerBalance;
