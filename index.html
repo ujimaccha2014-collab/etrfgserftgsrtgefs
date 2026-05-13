@@ -829,6 +829,8 @@
     <button id="ranking-btn" onclick="openRanking()">🏆 ランキング</button>
     <button id="rules-btn" onclick="openRules()" style="background:rgba(255,255,255,0.97);border:2px solid #81d4fa;border-radius:10px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold;color:#0288d1;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background 0.2s;">📖 る～るせつめい</button>
     <button onclick="openPetScreen()" style="background:rgba(255,255,255,0.97);border:2px solid #ce93d8;border-radius:10px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold;color:#7b1fa2;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background 0.2s;">🐾 ペット</button>
+    <button onclick="openHospital()" style="background:rgba(255,255,255,0.97);border:2px solid #ef9a9a;border-radius:10px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold;color:#c62828;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background 0.2s;">🏥 病院</button>
+    <button onclick="openATM()" style="background:rgba(255,255,255,0.97);border:2px solid #a5d6a7;border-radius:10px;padding:5px 10px;cursor:pointer;font-size:12px;font-weight:bold;color:#2e7d32;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background 0.2s;">🏧 ATM</button>
   </div>
 
   <!-- レース画面 -->
@@ -877,6 +879,7 @@
     <div id="mon-type-tag" class="personality-tag">--</div>
     <div style="font-size:14px;margin-top:6px;">はやさ: <span id="mon-stat-spd" class="stat-stars"></span></div>
     <div style="font-size:14px;">スタミナ: <span id="mon-stat-stm" class="stat-stars"></span></div>
+    <div style="font-size:14px;margin-top:2px;">❤️ HP: <span id="mon-hp" style="font-weight:bold;color:#e53935;">--</span> / <span id="mon-hp-max" style="color:#888;">--</span></div>
     <div style="font-size:15px;margin-top:7px;">きょり: <span id="mon-dist" style="font-weight:bold;color:#689f38;">0</span>m</div>
     <div id="mon-desc" style="font-size:13px;color:#666;margin-top:4px;">--</div>
     <div class="gauge-bg"><div id="mon-energy" class="gauge-fill"></div></div>
@@ -1122,21 +1125,49 @@
         <div style="background:#e1f5fe;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#0288d1;margin-bottom:6px;">🏁 レースについて</div>
           <p style="margin:0 0 6px;">100体のロボットがゴール（1500m）をめざして走ります。いちばんはやくゴールしたロボットが優勝！</p>
-          <p style="margin:0 0 4px;">「みんなで出発！」ボタンを押すとスタートします。</p>
+          <p style="margin:0 0 4px;">「出発！」ボタンを押すとスタートします。</p>
           <p style="margin:0;font-size:13px;color:#0277bd;">レース中は左下のステータスモニターで選択中ロボットの動きを確認できます。</p>
+        </div>
+
+        <!-- HP・転ぶ -->
+        <div style="background:#fbe9e7;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#bf360c;margin-bottom:6px;">❤️ HP・転ぶについて</div>
+          <p style="margin:0 0 6px;font-size:13px;">すべてのロボットとペットには <strong>HP（1〜25）</strong> があります。</p>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;">
+            <tr style="background:#ffccbc;"><th style="padding:4px 8px;text-align:left;">できごと</th><th style="padding:4px 8px;text-align:left;">効果</th></tr>
+            <tr><td style="padding:4px 8px;">😵 転ぶ</td><td style="padding:4px 8px;">HP −1 ／ 2秒間停止</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;">🐌 転んだ後</td><td style="padding:4px 8px;">15秒間スピード65%ダウン</td></tr>
+            <tr><td style="padding:4px 8px;">💀 HP0</td><td style="padding:4px 8px;">その場で動けなくなる（ゴールまで待機）</td></tr>
+          </table>
+          <div style="font-size:12px;background:#fff3e0;border-radius:8px;padding:8px;">
+            ⚡ <strong>速さが高いほど転びやすい！</strong> 速いペットは要注意。<br>
+            🤖 通常ロボットはHPが0でも次のレースで復活します。<br>
+            🐾 ペットのHPは持続します。HP0のペットは病院で治療が必要です。
+          </div>
+        </div>
+
+        <!-- 病院 -->
+        <div style="background:#fce4ec;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#c2185b;margin-bottom:6px;">🏥 病院について</div>
+          <p style="margin:0 0 6px;font-size:13px;">「🏥 病院」ボタンから病院画面を開けます。HP0になったペットを治療できます。</p>
+          <div style="background:#fff;border-radius:8px;padding:8px;font-size:13px;border:1px solid #f8bbd0;">
+            💊 治療費：<strong>15京円</strong>（1体につき）<br>
+            治療するとHPが <strong>25に全回復</strong> します。<br>
+            野生ロボット（通常の100体）は治療不要です。
+          </div>
         </div>
 
         <!-- 賭けのやり方 -->
         <div style="background:#f1f8e9;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#388e3c;margin-bottom:6px;">🎰 賭けのやり方</div>
           <ol style="margin:0;padding-left:18px;">
-            <li style="margin-bottom:5px;">右上の「レース賭け」パネルで、応援したいロボットを選ぶ</li>
+            <li style="margin-bottom:5px;">右上の「レース賭け」パネルで応援したいロボットを選ぶ</li>
             <li style="margin-bottom:5px;">賭け金を入力する（最低 <strong>30円</strong> から）</li>
             <li style="margin-bottom:5px;">「賭ける」ボタンを押す</li>
-            <li>「みんなで出発！」でレース開始！</li>
+            <li>「出発！」でレース開始！</li>
           </ol>
           <div style="margin-top:8px;background:#fff9c4;border-radius:8px;padding:8px;font-size:13px;">
-            ✅ 選んだロボットが1位ならお金がもらえる！<br>
+            ✅ 選んだロボットが1位なら <strong>賭け金 × オッズ</strong> がもらえる！<br>
             ❌ 外れたら賭け金はなくなるよ。<br>
             💡 賭けなくてもレースは見られます。
           </div>
@@ -1147,17 +1178,15 @@
           <div style="font-weight:bold;font-size:15px;color:#ef6c00;margin-bottom:6px;">📊 オッズとは？</div>
           <p style="margin:0 0 6px;">オッズは「賭け金が何倍になって返ってくるか」の数字です。</p>
           <p style="margin:0 0 6px;">例：<strong>100円を2.5xに賭けて当たると → 250円もらえる！</strong></p>
-          <p style="margin:0 0 4px;font-size:13px;color:#888;">強そうなロボット（速さ・スタミナが高い）はオッズが低くなります。</p>
-          <p style="margin:0;font-size:13px;color:#888;">弱そうなロボットは低オッズで当てにくいけど、当たったときのリターンが大きい！</p>
+          <p style="margin:0;font-size:13px;color:#888;">強そうなロボットはオッズが低く、弱そうなロボットは高オッズ。大穴狙いも面白い！</p>
         </div>
 
         <!-- ロボットのステータス -->
         <div style="background:#fce4ec;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#c2185b;margin-bottom:6px;">⭐ ロボットのステータス</div>
-          <p style="margin:0 0 8px;font-size:13px;">各ロボットには <strong>速さ</strong> と <strong>スタミナ</strong> があります。</p>
           <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;">
             <tr style="background:#f8bbd0;"><th style="padding:5px 8px;text-align:left;">ステータス</th><th style="padding:5px 8px;text-align:left;">意味</th></tr>
-            <tr><td style="padding:5px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:5px 8px;">基本の走るはやさ。★が多いほどぐんぐん進む</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:5px 8px;">基本の走るはやさ。★が多いほどぐんぐん進む（転びやすくもなる）</td></tr>
             <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">💪 スタミナ</td><td style="padding:5px 8px;">エネルギーの多さ。★が多いほど後半もバテにくい</td></tr>
           </table>
           <div style="font-size:13px;background:#fff;border-radius:8px;padding:8px;border:1px solid #f8bbd0;">
@@ -1171,68 +1200,91 @@
           <div style="font-weight:bold;font-size:15px;color:#c2185b;margin-bottom:8px;">🤖 ロボットのタイプ</div>
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <tr style="background:#f8bbd0;"><th style="padding:5px 8px;text-align:left;">タイプ</th><th style="padding:5px 8px;text-align:left;">とくちょう</th></tr>
-            <tr><td style="padding:5px 8px;font-weight:bold;">⚡ だっしゅ</td><td style="padding:5px 8px;">最初がとても速い。後半はバテやすいので早めに差が開く展開が得意</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🐢 のんびり</td><td style="padding:5px 8px;">序盤はゆっくりだが疲れにくい。長距離で安定して上位に来やすい</td></tr>
-            <tr><td style="padding:5px 8px;font-weight:bold;">🔥 しあげ</td><td style="padding:5px 8px;">ゴール直前で爆発的に加速！中盤は遅くても逆転優勝がある</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🎲 きまぐれ</td><td style="padding:5px 8px;">走ったり止まったり完全に予測不能。大穴狙いにどうぞ</td></tr>
-            <tr><td style="padding:5px 8px;font-weight:bold;">🌀 わーぷ</td><td style="padding:5px 8px;">たまに突然前へワープ！発動すれば一気に順位が上がる</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">💪 ねばり</td><td style="padding:5px 8px;">エネルギーが減っても速度が落ちにくい。後半に強い安定型</td></tr>
-            <tr><td style="padding:5px 8px;font-weight:bold;">🎉 おまつり</td><td style="padding:5px 8px;">近くにロボットが多いほど速くなる。序盤の密集地帯で輝く</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🍀 らっきー</td><td style="padding:5px 8px;">たまに超高速のラッキータイム発動！運が良ければ逆転も</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">⚡ だっしゅ</td><td style="padding:5px 8px;">最初がとても速い。後半はバテやすい</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🐢 のんびり</td><td style="padding:5px 8px;">疲れにくく長距離で安定して上位に来やすい</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">🔥 しあげ</td><td style="padding:5px 8px;">ゴール直前で爆発的に加速！逆転優勝がある</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🎲 きまぐれ</td><td style="padding:5px 8px;">走ったり止まったり完全に予測不能。大穴狙いに</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">🌀 わーぷ</td><td style="padding:5px 8px;">たまに突然前へワープ！発動すれば一気に上位へ</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">💪 ねばり</td><td style="padding:5px 8px;">エネルギーが減っても速度が落ちにくい後半型</td></tr>
+            <tr><td style="padding:5px 8px;font-weight:bold;">🎉 おまつり</td><td style="padding:5px 8px;">近くにロボットが多いほど速くなる序盤型</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;font-weight:bold;">🍀 らっきー</td><td style="padding:5px 8px;">たまに超高速のラッキータイム発動！運次第で逆転</td></tr>
           </table>
         </div>
 
         <!-- ペット -->
         <div style="background:#f3e5f5;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
           <div style="font-weight:bold;font-size:15px;color:#7b1fa2;margin-bottom:8px;">🐾 ペットについて</div>
-          <p style="margin:0 0 8px;font-size:13px;">残高が貯まったら、自分だけのペットロボットを作れます！ペットをレースに参加させると特別なオッズで勝負できます。</p>
+          <p style="margin:0 0 8px;font-size:13px;">残高が貯まったら自分だけのペットロボットを作れます！ペットをレースに参加させて勝負しよう。</p>
 
           <div style="font-weight:bold;font-size:13px;color:#6a1b9a;margin-bottom:4px;">📋 ペットの作り方</div>
           <ol style="margin:0 0 10px;padding-left:18px;font-size:13px;">
             <li style="margin-bottom:4px;">「🐾 ペット」ボタンからペット画面を開く</li>
-            <li style="margin-bottom:4px;">「＋ 作成」ボタンを押してエディターを開く</li>
-            <li style="margin-bottom:4px;">名前・タイプ・ステータス・色を設定して購入</li>
-            <li>作ったペットを選んで「🎰 このペットで賭ける」！</li>
+            <li style="margin-bottom:4px;">「＋ 作成」ボタンでエディターを開く</li>
+            <li style="margin-bottom:4px;">名前・タイプ・ステータス・見た目を設定して購入</li>
+            <li>作ったペットを選んで「🏁 レースに出す」！</li>
           </ol>
 
           <div style="font-weight:bold;font-size:13px;color:#6a1b9a;margin-bottom:6px;">💰 ペット作成コスト</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px;">
             <tr style="background:#e1bee7;"><th style="padding:4px 8px;text-align:left;">項目</th><th style="padding:4px 8px;text-align:left;">コスト</th><th style="padding:4px 8px;text-align:left;">説明</th></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">基本料金</td><td style="padding:4px 8px;">500垓円</td><td style="padding:4px 8px;">作成するだけでかかる固定費</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:4px 8px;">+1500京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに1500京円追加</td></tr>
-            <tr><td style="padding:4px 8px;font-weight:bold;">💪 スタミナ</td><td style="padding:4px 8px;">+3000京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに3000京円追加</td></tr>
-            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🎯 オッズ倍率</td><td style="padding:4px 8px;">+1000京円/段階</td><td style="padding:4px 8px;">当たったときの配当倍率を上げる</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">基本料金</td><td style="padding:4px 8px;">500千垓円</td><td style="padding:4px 8px;">作成するだけでかかる固定費</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">⚡ 速さ</td><td style="padding:4px 8px;">+1500兆京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに追加</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">💪 スタミナ</td><td style="padding:4px 8px;">+3000兆京円/段階</td><td style="padding:4px 8px;">1段階上げるごとに追加</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">🎯 オッズ倍率</td><td style="padding:4px 8px;">+1000兆京円/段階</td><td style="padding:4px 8px;">最大1000x。当たり配当に掛け算される</td></tr>
           </table>
-          <div style="font-size:12px;background:#f3e5f5;border-radius:8px;padding:8px;border:1px solid #ce93d8;margin-bottom:8px;">
-            <strong>タイプ別コスト：</strong><br>
-            🐢 のんびり: 50京　⚡ だっしゅ: 75京　🍀 らっきー: 75京　🎉 おまつり: 75京<br>
-            🔥 しあげ: 100京　💪 ねばり: 125京　🌀 わーぷ: 250京　🎲 きまぐれ: 500京
-          </div>
 
           <div style="font-weight:bold;font-size:13px;color:#6a1b9a;margin-bottom:4px;">🏁 ペットレースの使い方</div>
-          <p style="margin:0 0 4px;font-size:13px;">ペットで賭けると参加費 <strong>10京円</strong> がかかります。</p>
-          <p style="margin:0 0 4px;font-size:13px;">ペットの <strong>オッズ倍率</strong> が通常のオッズにかけ算されるので、強いペットほど当たったときのリターンが大きくなります！</p>
-          <p style="margin:0;font-size:12px;color:#888;">🌐「みんなのペット」でほかのプレイヤーのペットを見ることもできます。</p>
+          <p style="margin:0 0 4px;font-size:13px;">「出発！」を押すとペット賭け確認画面が開きます。</p>
+          <div style="background:#fff;border-radius:8px;padding:8px;font-size:12px;border:1px solid #ce93d8;margin-bottom:6px;">
+            🎟 参加費：<strong>10京円</strong>（固定・返金なし）<br>
+            🎰 掛け金：自由に設定（0円でもOK）<br>
+            🏆 当たった時の配当：<strong>参加費 + 掛け金 × オッズ</strong>
+          </div>
+          <p style="margin:0;font-size:12px;color:#888;">🌐「みんなのペット」でほかのプレイヤーのペットも見られます。</p>
         </div>
 
-        <!-- 初心者おすすめ -->
+        <!-- ATM -->
+        <div style="background:#e8f5e9;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#2e7d32;margin-bottom:6px;">🏧 ATMについて</div>
+          <p style="margin:0 0 6px;font-size:13px;">「🏧 ATM」ボタンからATM画面を開けます。</p>
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <tr style="background:#c8e6c9;"><th style="padding:4px 8px;text-align:left;">機能</th><th style="padding:4px 8px;text-align:left;">説明</th></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">💳 預け入れ</td><td style="padding:4px 8px;">残高の確認・記録用</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:4px 8px;font-weight:bold;">💸 引き出し</td><td style="padding:4px 8px;">残高の確認・記録用</td></tr>
+            <tr><td style="padding:4px 8px;font-weight:bold;">📤 送金</td><td style="padding:4px 8px;">他のプレイヤーにお金を送れる！手数料なし</td></tr>
+          </table>
+          <p style="margin:6px 0 0;font-size:12px;color:#888;">送金はユーザー一覧から相手を選ぶだけ。リアルタイムで相手に届きます。</p>
+        </div>
+
+        <!-- ギフト -->
+        <div style="background:#e8f5e9;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+          <div style="font-weight:bold;font-size:15px;color:#2e7d32;margin-bottom:6px;">🎁 ペットギフトについて</div>
+          <p style="margin:0 0 6px;font-size:13px;">ペットカードの「🎁 ギフト」ボタンから他のプレイヤーにペットを送れます。</p>
+          <div style="background:#fff;border-radius:8px;padding:8px;font-size:12px;border:1px solid #a5d6a7;">
+            1️⃣ ペットカードの「🎁 ギフト」を押す<br>
+            2️⃣ ユーザー一覧から送る相手を選ぶ<br>
+            3️⃣ 相手にリアルタイムでポップアップが届く<br>
+            ✅ 相手が「受け取る」→ 相手のペットに追加・自分から消える<br>
+            ❌ 相手が「断る」→ 何も起きない（自分のペットは戻らない）
+          </div>
+          <p style="margin:6px 0 0;font-size:12px;color:#e53935;">⚠️ ギフトを送ると自分のリストからペットが消えます。慎重に！</p>
+        </div>
+
+        <!-- ランキング -->
         <div style="background:#e8eaf6;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-          <div style="font-weight:bold;font-size:15px;color:#3949ab;margin-bottom:6px;">🌱 初心者おすすめ機能</div>
-          <p style="margin:0 0 4px;">「勝ちやすい子（上位5）」パネルの <strong>🌱 初心者おすすめ</strong> ボタンを押すと…</p>
-          <ul style="margin:4px 0 0;padding-left:18px;font-size:13px;">
-            <li>速さ★4以上・スタミナ★3以上の安定したロボット</li>
-            <li>タイプ「きまぐれ」の中で勝率が最も高いロボット</li>
-          </ul>
-          <p style="margin:6px 0 0;font-size:13px;color:#888;">を自動で選んでくれます！迷ったらまずこれ！</p>
+          <div style="font-weight:bold;font-size:15px;color:#3949ab;margin-bottom:6px;">🏆 ランキングについて</div>
+          <p style="margin:0 0 4px;font-size:13px;">「🏆 ランキング」ボタンで全プレイヤーの順位を確認できます。</p>
+          <p style="margin:0 0 4px;font-size:13px;">上位 <strong>5位</strong> まで表示。残高ランキングと勝率ランキングを切り替えられます。</p>
+          <p style="margin:0;font-size:12px;color:#888;">BANされたユーザーはランキングに表示されません。</p>
         </div>
 
         <!-- 残高 -->
-        <div style="background:#e8f5e9;border-radius:12px;padding:12px 14px;">
-          <div style="font-weight:bold;font-size:15px;color:#2e7d32;margin-bottom:6px;">💰 残高について</div>
+        <div style="background:#fff9c4;border-radius:12px;padding:12px 14px;">
+          <div style="font-weight:bold;font-size:15px;color:#f57f17;margin-bottom:6px;">💰 残高について</div>
           <p style="margin:0 0 4px;">最初の残高は <strong>1,000円</strong> です。</p>
-          <p style="margin:0 0 4px;">賭けに勝つとオッズ分だけ増え、負けると賭け金がなくなります。</p>
+          <p style="margin:0 0 4px;">賭けに勝つと増え、負けると賭け金がなくなります。</p>
           <p style="margin:0 0 4px;font-size:13px;">残高が足りなくなったらプロフィール画面でリセットできます。</p>
-          <p style="margin:0;font-size:13px;color:#888;">💡 ランキングはプロフィールタブで確認！上位を目指そう！</p>
+          <p style="margin:0;font-size:12px;color:#888;">💡 ATMの送金や他プレイヤーからのギフトでも増やせます！</p>
         </div>
 
       </div>
@@ -1364,6 +1416,17 @@
         </div>
       </div>
 
+      <!-- HP上限 -->
+      <div class="pet-editor-row">
+        <div class="pet-editor-label">❤️ HP上限 <span class="cost-tag" id="pet-hp-cost-label">（初期値1個は無料）</span></div>
+        <div class="pet-stat-row">
+          <input type="range" id="pet-hp-range" min="1" max="50" value="1" oninput="updatePetCost()">
+          <span class="pet-stat-val" id="pet-hp-val">1</span>
+          <span style="font-size:12px;color:#888;">/ 50</span>
+        </div>
+        <div style="font-size:11px;color:#888;margin-top:3px;">1個目は0円。2個目以降は1個につき150那由多円</div>
+      </div>
+
       <!-- オッズ固定倍率 -->
       <div class="pet-editor-row">
         <div class="pet-editor-label">🎯 オッズ固定倍率 <span class="cost-tag" id="pet-odds-cost-label"></span></div>
@@ -1380,6 +1443,7 @@
         <div class="pet-cost-row"><span>タイプ費用</span><span id="pc-type">-</span></div>
         <div class="pet-cost-row"><span>はやさ費用</span><span id="pc-spd">-</span></div>
         <div class="pet-cost-row"><span>スタミナ費用</span><span id="pc-stm">-</span></div>
+        <div class="pet-cost-row"><span>HP追加費用</span><span id="pc-hp">-</span></div>
         <div class="pet-cost-row"><span>オッズ倍率費用</span><span id="pc-odds">-</span></div>
         <div class="pet-cost-total"><span>合計</span><span id="pc-total">-</span></div>
         <div style="margin-top:6px;font-size:12px;color:#888;">あなたの残高: <span id="pc-balance">-</span>円</div>
@@ -1445,6 +1509,22 @@
       document.getElementById('firebase-status').innerText = "Firebase: 未接続（設定を確認してください）";
       document.getElementById('firebase-warning').style.display = 'block';
     }
+
+    // ===== ユーザー登録・全ユーザー取得 =====
+    window._fbRegisterUser = async function(uid, name, spirit) {
+      if (!firebaseOK || !db) return;
+      try {
+        await set(ref(db, 'users/' + uid), { name: name || 'プレイヤー', spirit: spirit || '', updatedAt: Date.now() });
+      } catch(e) { console.warn('Firebase registerUser failed:', e); }
+    };
+
+    window._fbGetAllUsers = async function() {
+      if (!firebaseOK || !db) return null;
+      try {
+        const snap = await get(ref(db, 'users'));
+        return snap.exists() ? snap.val() : {};
+      } catch(e) { console.warn('Firebase getAllUsers failed:', e); return null; }
+    };
 
     window._fbSaveRanking = async function(userId, name, balance, totalBets, wins, spirit) {
       if (!firebaseOK || !db) return;
@@ -1523,6 +1603,73 @@
         console.warn('Firebase admin_overrides mark failed:', e);
       }
     };
+
+    // ===== 送金 =====
+    window._fbSendMoney = async function(fromUid, fromName, toUid, amount) {
+      if (!firebaseOK || !db) return false;
+      try {
+        // 受取人のinbox/money/{push}に書き込む
+        const { push: fbPush } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+        const inboxRef = ref(db, `inbox/${toUid}/money`);
+        await fbPush(inboxRef, { fromUid, fromName, amount, ts: Date.now() });
+        return true;
+      } catch(e) {
+        console.warn('Firebase sendMoney failed:', e);
+        return false;
+      }
+    };
+
+    window._fbListenIncomingMoney = function(uid, callback) {
+      if (!firebaseOK || !db) return;
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({ onChildAdded, remove }) => {
+        const inboxRef = ref(db, `inbox/${uid}/money`);
+        onChildAdded(inboxRef, async (snap) => {
+          const d = snap.val();
+          if (!d) return;
+          callback(d.fromName, d.amount);
+          // 読んだら削除
+          await remove(snap.ref);
+        });
+      });
+    };
+
+    // ===== ペットギフト =====
+    window._fbSendPetGift = async function(fromUid, fromName, toUid, pet) {
+      if (!firebaseOK || !db) return false;
+      try {
+        const { push: fbPush } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+        const giftRef = ref(db, `inbox/${toUid}/gifts`);
+        await fbPush(giftRef, { fromUid, fromName, pet, ts: Date.now() });
+        return true;
+      } catch(e) {
+        console.warn('Firebase sendPetGift failed:', e);
+        return false;
+      }
+    };
+
+    window._fbListenPetGifts = function(uid, callback) {
+      if (!firebaseOK || !db) return;
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({ onChildAdded }) => {
+        const giftsRef = ref(db, `inbox/${uid}/gifts`);
+        onChildAdded(giftsRef, (snap) => {
+          const d = snap.val();
+          if (!d) return;
+          callback({ giftId: snap.key, fromUid: d.fromUid, fromName: d.fromName, pet: d.pet });
+        });
+      });
+    };
+
+    window._fbRespondPetGift = async function(giftId, response, toUid, toName) {
+      if (!firebaseOK || !db) return;
+      try {
+        const { remove } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+        // 受信ボックスから削除
+        await remove(ref(db, `inbox/${toUid}/gifts/${giftId}`));
+      } catch(e) {
+        console.warn('Firebase respondPetGift failed:', e);
+      }
+    };
+
   </script>
 
   <script>
@@ -1753,6 +1900,9 @@
       if (s) profile.spirit = s;
       saveData();
       syncToFirebase();
+      if (typeof window._fbRegisterUser === 'function') {
+        window._fbRegisterUser(userId, profile.name, profile.spirit);
+      }
       document.getElementById('prof-display-name').innerText = profile.name;
       document.getElementById('prof-display-spirit').innerText = profile.spirit;
       showToast('プロフィールを保存しました！');
@@ -1911,6 +2061,7 @@
       return "★".repeat(starsOn) + "☆".repeat(5 - starsOn);
     }
 
+
     function initRace() {
       track.querySelectorAll('.robot').forEach(r => r.remove());
       grid.innerHTML = '';
@@ -1936,10 +2087,13 @@
         botEl.innerText = i;
         track.appendChild(botEl);
 
+        const botMaxHp = Math.floor(25 + Math.random() * 6);
         robots.push({
           id: i, el: botEl, x: 0, color,
           type, maxEnergy: mEne, energy: mEne,
           baseSpeed: bSpd, done: false,
+          hp: botMaxHp, maxHp: botMaxHp,
+          stumbled: false, stumbleTimer: 0, slowTimer: 0,
           statSpd: getStars(bSpd, 3, 8),
           statStm: getStars(mEne, 700, 1700)
         });
@@ -1952,9 +2106,41 @@
     }
 
     function update() {
+      const TICK_MS = 40;
       robots.forEach(r => {
         if (r.done) return;
+
+        // HP0 → 停止（ゴール待ち）
+        if (r.hp <= 0) {
+          r.el.style.opacity = '0.4';
+          r.el.title = '💀 HP0 停止中';
+          return;
+        }
+
+        // 転んでいる → 2秒停止
+        if (r.stumbled) {
+          r.stumbleTimer -= TICK_MS;
+          if (r.stumbleTimer <= 0) {
+            r.stumbled = false;
+            r.el.style.transform = '';
+            r.el.style.filter = '';
+            r.el.style.boxShadow = '';
+            r.el.style.zIndex = '10';
+            r.el.style.transition = 'transform 0.3s, filter 0.3s';
+            r.slowTimer = 15000; // 15秒スロー
+          }
+          return;
+        }
+
         let s = r.baseSpeed;
+
+        // スロー中（転んだ後15秒）
+        if (r.slowTimer > 0) {
+          r.slowTimer -= TICK_MS;
+          s *= 0.35;
+        }
+
+        // タイプ別行動
         if (r.type === 'dash' && r.x < 4000) s *= 1.8;
         if (r.type === 'relax') r.energy -= 0.3; else r.energy -= 1.1;
         if (r.type === 'climb' && r.x > 10000) s *= 2.2;
@@ -1970,6 +2156,40 @@
           s = (r.type === 'tough') ? s * 0.6 : s * 0.15;
           r.el.classList.add('resting');
         }
+
+        // 転ぶ判定：速さに応じて確率アップ（ペットのspd or baseSpeedベース）
+        const spdStat = r.isPet ? (r.petSpd || r.baseSpeed) : r.baseSpeed;
+        // 確率大幅アップ: 最低1.5%/tick、最大4%/tick（以前の約8倍）
+        // 基準0.0025、速さに応じて区間線形補間
+        // 遅い(3)→×0.25、普通(5)→×3、速い(8)→×6、ペット最大(33)→×16.5キャップ
+        const baseChance = 0.0020;
+        let spdMult;
+        if (spdStat <= 3)      spdMult = 0.25;
+        else if (spdStat <= 5) spdMult = 0.25 + (spdStat - 3) / 2 * 2.75;
+        else if (spdStat <= 8) spdMult = 3.0  + (spdStat - 5) / 3 * 3.0;
+        else                   spdMult = Math.min(16.5, 6.0 + (spdStat - 8) / 25 * 10.5);
+        const stumbleChance = baseChance * spdMult;
+        if (Math.random() < stumbleChance) {
+          r.stumbled = true;
+          // 転び時間をランダムに（2〜5秒）
+          r.stumbleTimer = 2000 + Math.random() * 3000;
+          r.hp = Math.max(0, r.hp - 1);
+          // 盛大な転び演出：ランダムな回転＋吹っ飛び＋激しいフィルター
+          const spinDeg = [90, 180, 270, 360, -90, -180][Math.floor(Math.random() * 6)];
+          const bounceY = (Math.random() > 0.5 ? -1 : 1) * (20 + Math.random() * 40);
+          r.el.style.transform = `rotate(${spinDeg}deg) translateY(${bounceY}px) scale(${0.5 + Math.random() * 0.5})`;
+          r.el.style.filter = 'brightness(2) saturate(0) hue-rotate(180deg)';
+          r.el.style.transition = 'transform 0.15s, filter 0.1s';
+          r.el.style.zIndex = '200';
+          // 転びアニメーション：フラッシュ
+          r.el.style.boxShadow = '0 0 20px 8px rgba(255,80,0,0.8)';
+          // ペットならhpをpetsデータにも反映
+          if (r.isPet) {
+            const p = pets.find(p => 'pet_' + p.name === r.id);
+            if (p) { p.hp = r.hp; saveData(); }
+          }
+        }
+
         r.x += Math.max(0.5, s + (Math.random() * 1.5));
         r.el.style.left = r.x + 'px';
         if (r.x >= goalPx) { r.done = true; r.x = goalPx; 終わり.push(r); }
@@ -2018,6 +2238,11 @@
         document.getElementById('mon-stat-spd').innerText = target.statSpd;
         document.getElementById('mon-stat-stm').innerText = target.statStm;
         document.getElementById('mon-energy').style.width = (target.energy / target.maxEnergy * 100) + "%";
+        const curHp = target.hp !== undefined ? target.hp : target.maxHp;
+        const maxHp = target.maxHp || 25;
+        document.getElementById('mon-hp').innerText = curHp;
+        document.getElementById('mon-hp').style.color = curHp <= 0 ? '#b71c1c' : curHp <= 5 ? '#e53935' : '#43a047';
+        document.getElementById('mon-hp-max').innerText = maxHp;
       }
 
       updateOddsDisplay();
@@ -2273,7 +2498,11 @@
               petName: pet.name,
               petBorder: pet.border || false,
               petOddsX: pet.oddsX || 1,
+              petSpd: petSpd,
               el: petEl,
+              hp: pet.hp !== undefined ? pet.hp : (pet.maxHp || 25),
+              maxHp: pet.maxHp || 25,
+              stumbled: false, stumbleTimer: 0, slowTimer: 0,
               x: 0,
               color: pet.color || '#ff8a65',
               type: pet.type || 'relax',
@@ -2425,14 +2654,16 @@
       }
       return html;
     }
-    function petCostCalc(type, spd, stm, oddsX) {
-      const init    = 500e20; // 500垓円
+    function petCostCalc(type, spd, stm, oddsX, maxHp) {
+      const init    = 500e23; // 500垓円×1000
       const typeCost = PET_TYPE_COST[type] || 0;
-      const spdCost  = (spd - 1) * 1500e15; // 1500京/段階
-      const stmCost  = (stm - 1) * 3000e15; // 3000京/段階
-      const oddsCost = (oddsX - 1) * 1000e15;
-      return { init, typeCost, spdCost, stmCost, oddsCost,
-               total: init + typeCost + spdCost + stmCost + oddsCost };
+      const spdCost  = (spd - 1) * 1500e18; // 1500京×1000/段階
+      const stmCost  = (stm - 1) * 3000e18; // 3000京×1000/段階
+      const oddsCost = (oddsX - 1) * 1000e18;
+      const hpSlots  = (maxHp || 1);
+      const hpCost   = hpSlots <= 1 ? 0 : (hpSlots - 1) * 150e60; // 1個目無料、2個目以降150那由多円/個
+      return { init, typeCost, spdCost, stmCost, oddsCost, hpCost,
+               total: init + typeCost + spdCost + stmCost + oddsCost + hpCost };
     }
 
     let selectedPetIdx = -1;
@@ -2495,7 +2726,12 @@
             <div class="pet-card-stats">
               ⚡ はやさ: ${petStars(p.spd)} (${p.spd})<br>
               💪 スタミナ: ${petStars(p.stm)} (${p.stm})<br>
-              🎯 オッズ倍率: ${p.oddsX}x
+              🎯 オッズ倍率: ${p.oddsX}x<br>
+              ❤️ HP: ${p.hp!==undefined?p.hp:(p.maxHp||25)}/${p.maxHp||25} ${(p.hp===0)?'<span style="color:#e53935;font-weight:bold;">要治療！</span>':''}
+            </div>
+            <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+              <button onclick="event.stopPropagation();promptGiftSend(${i})" style="padding:5px 8px;background:#81c784;color:white;border:none;border-radius:8px;font-size:11px;font-weight:bold;cursor:pointer;">🎁 ギフト</button>
+              ${(p.hp===0)?`<button onclick="event.stopPropagation();openHospital()" style="padding:5px 8px;background:#e53935;color:white;border:none;border-radius:8px;font-size:11px;font-weight:bold;cursor:pointer;">🏥 治療</button>`:''}
             </div>`;
           card.onclick = () => {
             selectedPetIdx = i;
@@ -2508,6 +2744,102 @@
         });
       }
     }
+
+    // ===== 👥 ユーザー選択モーダル =====
+    let _userPickerMode = null; // 'gift' | 'money'
+    let _userPickerPetIdx = -1;
+    let _userPickerMoneyAmt = 0;
+    let _allUsersCache = [];
+
+    async function openUserPicker(mode, petIdxOrAmt) {
+      _userPickerMode = mode;
+      if (mode === 'gift') _userPickerPetIdx = petIdxOrAmt;
+      else _userPickerMoneyAmt = petIdxOrAmt;
+
+      document.getElementById('user-picker-title').innerText = mode === 'gift' ? '🎁 ギフトを送る相手を選択' : '📤 送金先を選択';
+      document.getElementById('user-picker-search').value = '';
+      document.getElementById('user-picker-msg').innerText = '読み込み中...';
+      document.getElementById('user-picker-list').innerHTML = '';
+      document.getElementById('user-picker-modal').classList.add('open');
+
+      const allUsers = typeof window._fbGetAllUsers === 'function' ? await window._fbGetAllUsers() : null;
+      if (!allUsers) {
+        document.getElementById('user-picker-msg').innerText = 'ユーザー情報を取得できませんでした（Firebase未接続？）';
+        return;
+      }
+      _allUsersCache = Object.entries(allUsers)
+        .filter(([uid]) => uid !== userId)
+        .map(([uid, d]) => ({ uid, name: d.name || '名無し', spirit: d.spirit || '' }));
+
+      document.getElementById('user-picker-msg').innerText = '';
+      renderUserPickerList(_allUsersCache);
+    }
+
+    function renderUserPickerList(users) {
+      const el = document.getElementById('user-picker-list');
+      if (users.length === 0) {
+        el.innerHTML = '<div style="text-align:center;color:#aaa;padding:20px;">ユーザーが見つかりません</div>';
+        return;
+      }
+      el.innerHTML = users.map(u => `
+        <div onclick="selectUserFromPicker('${escHtml(u.uid)}')"
+          style="display:flex;align-items:center;gap:12px;padding:12px;background:#f9f9f9;border-radius:14px;border:2px solid #e0e0e0;cursor:pointer;transition:border-color 0.15s;"
+          onmouseover="this.style.borderColor='#ffb74d'" onmouseout="this.style.borderColor='#e0e0e0'">
+          <div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ffb74d,#ff8a65);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">👤</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:bold;font-size:14px;color:#333;">${escHtml(u.name)}</div>
+            <div style="font-size:11px;color:#aaa;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(u.spirit)}</div>
+            <div style="font-size:10px;color:#ccc;margin-top:1px;">${escHtml(u.uid)}</div>
+          </div>
+          <div style="font-size:22px;color:#ddd;">›</div>
+        </div>`).join('');
+    }
+
+    function filterUserPicker() {
+      const q = document.getElementById('user-picker-search').value.trim().toLowerCase();
+      const filtered = q ? _allUsersCache.filter(u => u.name.toLowerCase().includes(q) || u.uid.toLowerCase().includes(q)) : _allUsersCache;
+      renderUserPickerList(filtered);
+    }
+
+    async function selectUserFromPicker(toUid) {
+      const user = _allUsersCache.find(u => u.uid === toUid);
+      if (!user) return;
+      closeModal('user-picker-modal');
+
+      if (_userPickerMode === 'gift') {
+        const pet = pets[_userPickerPetIdx];
+        if (!pet) return;
+        if (!confirm(`「${pet.name}」を ${user.name} さんに送りますか？\n送ると自分のペットリストから消えます。`)) return;
+        sendPetGift(_userPickerPetIdx, toUid);
+
+      } else if (_userPickerMode === 'money') {
+        const amt = _userPickerMoneyAmt;
+        if (!confirm(`${user.name} さんに ${formatMoney(amt)}円 送金しますか？`)) return;
+        if (amt > playerBalance) { showToast('残高が足りません'); return; }
+        playerBalance -= amt;
+        saveData();
+        document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+        document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
+        const ok = await window._fbSendMoney(userId, profile.name, toUid, amt);
+        if (ok) {
+          showToast(`📤 ${user.name} さんに ${formatMoney(amt)}円 送金しました！`);
+          document.getElementById('atm-msg').style.color = '#2e7d32';
+          document.getElementById('atm-msg').innerText = `✅ ${user.name} さんに ${formatMoney(amt)}円 送金完了！`;
+        } else {
+          playerBalance += amt; saveData();
+          document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+          showToast('❌ 送金に失敗しました');
+        }
+      }
+    }
+    window.openUserPicker = openUserPicker;
+    window.filterUserPicker = filterUserPicker;
+    window.selectUserFromPicker = selectUserFromPicker;
+
+    function promptGiftSend(petIdx) {
+      openUserPicker('gift', petIdx);
+    }
+    window.promptGiftSend = promptGiftSend;
 
     function openPetEditor(isEdit) {
       petEditorMode = isEdit ? 'edit' : 'create';
@@ -2539,6 +2871,7 @@
         document.getElementById('pet-spd-range').value = p.spd;
         document.getElementById('pet-stm-range').value = p.stm;
         document.getElementById('pet-odds-range').value = p.oddsX;
+        document.getElementById('pet-hp-range').value = p.maxHp || 1;
         typeGrid.querySelectorAll('.pet-type-btn').forEach(b => {
           if (b.dataset.type === p.type) b.classList.add('selected');
         });
@@ -2549,6 +2882,7 @@
         document.getElementById('pet-spd-range').value = 1;
         document.getElementById('pet-stm-range').value = 1;
         document.getElementById('pet-odds-range').value = 1;
+        document.getElementById('pet-hp-range').value = 1;
         typeGrid.querySelector('.pet-type-btn')?.classList.add('selected');
       }
 
@@ -2582,14 +2916,17 @@
       const spd   = parseInt(document.getElementById('pet-spd-range').value);
       const stm   = parseInt(document.getElementById('pet-stm-range').value);
       const oddsX = parseFloat(document.getElementById('pet-odds-range').value);
+      const maxHp = parseInt(document.getElementById('pet-hp-range').value);
       const type  = getSelectedType();
-      const c     = petCostCalc(type, spd, stm, oddsX);
+      const c     = petCostCalc(type, spd, stm, oddsX, maxHp);
 
       document.getElementById('pet-spd-val').innerText = spd;
       document.getElementById('pet-stm-val').innerText = stm;
       document.getElementById('pet-odds-val').innerText = oddsX;
+      document.getElementById('pet-hp-val').innerText = maxHp;
       document.getElementById('pet-spd-stars').innerHTML = petStars(spd);
       document.getElementById('pet-stm-stars').innerHTML = petStars(stm);
+      document.getElementById('pet-hp-cost-label').innerText = maxHp <= 1 ? '（1個目は無料）' : `（＋${formatMoney(c.hpCost)}円）`;
 
       // スライダーが高い（50以上）のとき赤くハイライト
       const spdRange = document.getElementById('pet-spd-range');
@@ -2602,11 +2939,12 @@
       document.getElementById('pet-spd-cost-label').innerText = `（＋${formatMoney(c.spdCost)}円）`;
       document.getElementById('pet-stm-cost-label').innerText = `（＋${formatMoney(c.stmCost)}円）`;
       document.getElementById('pet-odds-cost-label').innerText = `（＋${formatMoney(c.oddsCost)}円）`;
-      document.getElementById('pet-type-cost-label').innerText = `（${formatMoney(petCostCalc(type,1,1,1).typeCost)}円）`;
+      document.getElementById('pet-type-cost-label').innerText = `（${formatMoney(petCostCalc(type,1,1,1,1).typeCost)}円）`;
 
       document.getElementById('pc-type').innerText  = formatMoney(c.typeCost)  + '円';
       document.getElementById('pc-spd').innerText   = formatMoney(c.spdCost)   + '円';
       document.getElementById('pc-stm').innerText   = formatMoney(c.stmCost)   + '円';
+      document.getElementById('pc-hp').innerText    = formatMoney(c.hpCost)    + '円';
       document.getElementById('pc-odds').innerText  = formatMoney(c.oddsCost)  + '円';
       document.getElementById('pc-total').innerText = formatMoney(c.total)     + '円';
       document.getElementById('pc-balance').innerText = formatMoney(playerBalance);
@@ -2625,7 +2963,7 @@
       // 編集モードは差額のみ
       if (petEditorMode === 'edit' && selectedPetIdx >= 0) {
         const oldP = pets[selectedPetIdx];
-        const oldC = petCostCalc(oldP.type, oldP.spd, oldP.stm, oldP.oddsX);
+        const oldC = petCostCalc(oldP.type, oldP.spd, oldP.stm, oldP.oddsX, oldP.maxHp || 1);
         const diff = c.total - oldC.total;
         document.getElementById('pet-confirm-btn').disabled = diff > 0 && playerBalance < diff;
         document.getElementById('pet-editor-msg').innerText =
@@ -2642,22 +2980,25 @@
       const spd   = parseInt(document.getElementById('pet-spd-range').value);
       const stm   = parseInt(document.getElementById('pet-stm-range').value);
       const oddsX = parseFloat(document.getElementById('pet-odds-range').value);
+      const maxHp = parseInt(document.getElementById('pet-hp-range').value);
       const type  = getSelectedType();
       const color = document.getElementById('pet-color-input').value;
-      const c     = petCostCalc(type, spd, stm, oddsX);
+      const c     = petCostCalc(type, spd, stm, oddsX, maxHp);
 
       if (petEditorMode === 'create') {
         if (playerBalance < c.total) { document.getElementById('pet-editor-msg').innerText = '残高が足りません'; return; }
         playerBalance -= c.total;
-        pets.push({ name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)), border: pveBorderEnabled });
+        pets.push({ name, type, spd, stm, oddsX, maxHp, hp: maxHp, color, parts: JSON.parse(JSON.stringify(pveParts)), border: pveBorderEnabled });
         showToast(`🐾 ${name} を作成しました！`);
       } else {
         const oldP = pets[selectedPetIdx];
-        const oldC = petCostCalc(oldP.type, oldP.spd, oldP.stm, oldP.oddsX);
+        const oldC = petCostCalc(oldP.type, oldP.spd, oldP.stm, oldP.oddsX, oldP.maxHp || 1);
         const diff = c.total - oldC.total;
         if (diff > 0 && playerBalance < diff) { document.getElementById('pet-editor-msg').innerText = '追加費用が足りません'; return; }
         playerBalance -= diff;
-        pets[selectedPetIdx] = { name, type, spd, stm, oddsX, color, parts: JSON.parse(JSON.stringify(pveParts)), border: pveBorderEnabled };
+        // HPの現在値をmaxHpに合わせてクランプ（maxHp増加時は現在値を維持、減少時は新maxHpでクランプ）
+        const currentHp = Math.min(oldP.hp !== undefined ? oldP.hp : oldP.maxHp || 1, maxHp);
+        pets[selectedPetIdx] = { name, type, spd, stm, oddsX, maxHp, hp: currentHp, color, parts: JSON.parse(JSON.stringify(pveParts)), border: pveBorderEnabled };
         showToast(`✏️ ${name} を更新しました！`);
       }
 
@@ -3097,8 +3438,6 @@
       document.querySelectorAll('.modal-overlay').forEach(m => {
         m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
       });
-      // Firebase module は type="module" のため body onload より遅れて初期化される。
-      // _fbGetAdminOverride が準備できるまで最大3秒待ってからチェックする。
       waitForFirebaseThenCheck();
     }
 
@@ -3108,6 +3447,20 @@
         if (typeof window._fbGetAdminOverride === 'function') {
           clearInterval(interval);
           checkAdminOverrides();
+          startGiftListener();
+          // 自分をユーザー一覧に登録
+          if (typeof window._fbRegisterUser === 'function') {
+            window._fbRegisterUser(userId, profile.name, profile.spirit);
+          }
+          // 送金着信リスナー
+          if (typeof window._fbListenIncomingMoney === 'function') {
+            window._fbListenIncomingMoney(userId, (fromName, amt) => {
+              playerBalance += amt;
+              saveData();
+              document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+              showToast(`💰 ${fromName} さんから ${formatMoney(amt)}円 受け取りました！`);
+            });
+          }
         } else if (Date.now() - start > 3000) {
           clearInterval(interval);
           console.warn('[admin] Firebase未初期化のためBANチェックをスキップしました');
@@ -3130,7 +3483,234 @@
     window.openPreRaceModal = openPreRaceModal;
     window.updatePreRaceOdds = updatePreRaceOdds;
     window.startWithBet = startWithBet;
+    // ===== 🏥 病院 =====
+    const HOSPITAL_COST = 15e15; // 15京円
+    function openHospital() {
+      const el = document.getElementById('hospital-list');
+      if (pets.length === 0) {
+        el.innerHTML = '<div style="color:#aaa;text-align:center;padding:20px;">ペットがいません</div>';
+      } else {
+        el.innerHTML = pets.map((p, i) => {
+          const hp = p.hp !== undefined ? p.hp : 25;
+          const isDead = hp <= 0;
+          return `<div style="background:${isDead?'#fff3f3':'#f9f9f9'};border-radius:14px;padding:12px;border:2px solid ${isDead?'#ef9a9a':'#e0e0e0'};display:flex;align-items:center;gap:12px;">
+            <div style="font-size:28px;">${isDead?'💀':'🐾'}</div>
+            <div style="flex:1;">
+              <div style="font-weight:bold;font-size:15px;">${escHtml(p.name)}</div>
+              <div style="font-size:12px;color:#888;">HP: ${hp}/25 ${'❤️'.repeat(Math.max(0,hp))}${'🖤'.repeat(Math.max(0,25-hp))}</div>
+            </div>
+            ${isDead
+              ? `<button onclick="treatPet(${i})" style="padding:8px 14px;background:#e53935;color:white;border:none;border-radius:10px;font-weight:bold;cursor:pointer;font-size:13px;">治療<br><span style='font-size:10px;'>15京円</span></button>`
+              : `<div style="font-size:12px;color:#43a047;font-weight:bold;">元気！</div>`
+            }
+          </div>`;
+        }).join('');
+      }
+      document.getElementById('hospital-modal').classList.add('open');
+    }
+    async function treatPet(idx) {
+      if (playerBalance < HOSPITAL_COST) { showToast('治療費（15京円）が足りません'); return; }
+      const maxHp = pets[idx].maxHp || 25;
+      pets[idx].hp = maxHp;
+      playerBalance -= HOSPITAL_COST;
+      saveData();
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+      // レース中のrobotにも即時反映
+      const liveBot = robots.find(r => r.isPet && r.petName === pets[idx].name);
+      if (liveBot) {
+        liveBot.hp = maxHp;
+        liveBot.el.style.opacity = '1';
+        liveBot.el.title = '';
+        liveBot.done = false;
+        liveBot.stumbled = false;
+        liveBot.stumbleTimer = 0;
+        liveBot.el.style.transform = '';
+        liveBot.el.style.filter = '';
+        liveBot.el.style.boxShadow = '';
+        liveBot.el.style.zIndex = '10';
+      }
+      showToast(`💊 ${pets[idx].name} を治療しました！（-15京円）`);
+      openHospital(); // 再描画
+    }
+    window.openHospital = openHospital;
+    window.treatPet = treatPet;
+
+    // ===== 🏧 ATM =====
+    let atmMode = 'deposit';
+    function openATM() {
+      document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('atm-msg').innerText = '';
+      atmSetMode('deposit');
+      document.getElementById('atm-modal').classList.add('open');
+    }
+    function atmSetMode(mode) {
+      atmMode = mode;
+      ['deposit','withdraw','send'].forEach(m => {
+        document.getElementById('atm-'+m+'-panel').style.display = m === mode ? '' : 'none';
+        const tab = document.getElementById('atm-tab-'+m);
+        tab.style.borderColor = m === mode ? '#a5d6a7' : '#e0e0e0';
+        tab.style.background  = m === mode ? '#e8f5e9' : '#fff';
+        tab.style.color       = m === mode ? '#2e7d32' : '#555';
+      });
+    }
+    function atmDeposit() {
+      // 預け入れ = ゲーム内残高はそのまま（表示上の「口座」機能は今後拡張用）
+      // 今回はゲーム内残高自体が「口座」なので、入金は何もしない（UIのみ）
+      document.getElementById('atm-msg').innerText = '✅ 預け入れ完了！（ゲーム内残高はそのままです）';
+    }
+    function atmWithdraw() {
+      const amt = Math.floor(Number(document.getElementById('atm-withdraw-amount').value) || 0);
+      if (amt <= 0) { document.getElementById('atm-msg').innerText = '金額を入力してください'; return; }
+      document.getElementById('atm-msg').innerText = '✅ 引き出し完了！（ゲーム内残高はそのままです）';
+    }
+    async function atmSend() {
+      const amt = Math.floor(Number(document.getElementById('atm-send-amount').value) || 0);
+      if (amt <= 0) { document.getElementById('atm-msg').innerText = '金額を入力してください'; return; }
+      if (amt > playerBalance) { document.getElementById('atm-msg').innerText = '残高が足りません'; return; }
+      document.getElementById('atm-msg').innerText = '';
+      closeModal('atm-modal');
+      openUserPicker('money', amt);
+    }
+    window.openATM = openATM;
+    window.atmSetMode = atmSetMode;
+    window.atmDeposit = atmDeposit;
+    window.atmWithdraw = atmWithdraw;
+    window.atmSend = atmSend;
+
+    // ===== 🎁 ペットギフト =====
+    const GIFT_HEAL_COST = 15e15;
+    let pendingGift = null;
+
+    async function sendPetGift(petIdx, toUserId) {
+      if (!pets[petIdx]) { showToast('ペットが見つかりません'); return; }
+      if (typeof window._fbSendPetGift !== 'function') { showToast('Firebase未接続のためギフトを送れません'); return; }
+      const pet = pets[petIdx];
+      const ok = await window._fbSendPetGift(userId, profile.name, toUserId, pet);
+      if (ok) {
+        pets.splice(petIdx, 1);
+        saveData();
+        showToast(`🎁 ${pet.name} をギフトとして送りました！相手が承認するまでお待ちください。`);
+        openPetScreen();
+      } else {
+        showToast('ギフト送信に失敗しました');
+      }
+    }
+    window.sendPetGift = sendPetGift;
+
+    function acceptGift() {
+      if (!pendingGift) return;
+      pets.push(pendingGift.pet);
+      saveData();
+      if (typeof window._fbRespondPetGift === 'function') {
+        window._fbRespondPetGift(pendingGift.giftId, 'accept', userId, profile.name);
+      }
+      showToast(`🎁 ${pendingGift.pet.name} を受け取りました！`);
+      document.getElementById('gift-popup').style.display = 'none';
+      pendingGift = null;
+    }
+    function rejectGift() {
+      if (!pendingGift) return;
+      if (typeof window._fbRespondPetGift === 'function') {
+        window._fbRespondPetGift(pendingGift.giftId, 'reject', userId, profile.name);
+      }
+      showToast('ギフトを断りました');
+      document.getElementById('gift-popup').style.display = 'none';
+      pendingGift = null;
+    }
+    window.acceptGift = acceptGift;
+    window.rejectGift = rejectGift;
+
+    function showGiftPopup(giftData) {
+      pendingGift = giftData;
+      const pet = giftData.pet;
+      document.getElementById('gift-popup-title').innerText = `🎁 ${escHtml(giftData.fromName)} さんからペットギフト！`;
+      document.getElementById('gift-popup-desc').innerText = `「${escHtml(pet.name)}」を送ってくれました。受け取りますか？`;
+      document.getElementById('gift-popup-pet').innerHTML = `
+        <div style="background:#f9f9f9;border-radius:12px;padding:10px;font-size:13px;text-align:left;">
+          <div style="font-weight:bold;font-size:15px;margin-bottom:4px;">${renderPetSvg(pet.parts,32,pet.border)} ${escHtml(pet.name)}</div>
+          <div>タイプ: ${PERSONALITIES[pet.type]?.name||pet.type} / ⚡${pet.spd} / 💪${pet.stm}</div>
+          <div>HP: ${pet.hp!==undefined?pet.hp:(pet.maxHp||25)}/${pet.maxHp||25}</div>
+        </div>`;
+      document.getElementById('gift-popup').style.display = 'block';
+    }
+    window.showGiftPopup = showGiftPopup;
+
+    // ペットギフト着信をFirebaseからリアルタイムで監視
+    function startGiftListener() {
+      if (typeof window._fbListenPetGifts === 'function') {
+        window._fbListenPetGifts(userId, (giftData) => {
+          showGiftPopup(giftData);
+        });
+      }
+    }
+
     window.appInit = appInit;
   </script>
+  <!-- 👥 ユーザー選択モーダル（送金・ギフト共通） -->
+  <div class="modal-overlay" id="user-picker-modal">
+    <div class="modal-box" style="max-width:440px;">
+      <div class="modal-title"><span id="user-picker-title">👥 ユーザーを選択</span><button class="modal-close" onclick="closeModal('user-picker-modal')">×</button></div>
+      <input id="user-picker-search" type="text" placeholder="🔍 名前で絞り込み..." oninput="filterUserPicker()"
+        style="width:100%;padding:8px 12px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;margin-bottom:10px;" />
+      <div id="user-picker-list" style="display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;"></div>
+      <div id="user-picker-msg" style="font-size:12px;color:#aaa;text-align:center;margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <!-- 🏥 病院モーダル -->
+  <div class="modal-overlay" id="hospital-modal">
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-title"><span>🏥 病院</span><button class="modal-close" onclick="closeModal('hospital-modal')">×</button></div>
+      <p style="font-size:13px;color:#888;margin-bottom:12px;">HPが0のペットを治療できます。治療費は<strong>15京円</strong>です。</p>
+      <div id="hospital-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+
+  <!-- 🏧 ATMモーダル -->
+  <div class="modal-overlay" id="atm-modal">
+    <div class="modal-box" style="max-width:400px;">
+      <div class="modal-title"><span>🏧 ATM</span><button class="modal-close" onclick="closeModal('atm-modal')">×</button></div>
+      <div style="background:#f9f9f9;border-radius:12px;padding:12px;margin-bottom:14px;font-size:14px;">
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:#888;">💰 現在の所持金</span>
+          <span id="atm-balance-disp" style="font-weight:bold;color:#2e7d32;">-</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <button onclick="atmSetMode('deposit')" id="atm-tab-deposit" style="flex:1;padding:8px;border:2px solid #a5d6a7;border-radius:10px;background:#e8f5e9;font-weight:bold;color:#2e7d32;cursor:pointer;">💳 預け入れ</button>
+        <button onclick="atmSetMode('withdraw')" id="atm-tab-withdraw" style="flex:1;padding:8px;border:2px solid #e0e0e0;border-radius:10px;background:#fff;font-weight:bold;color:#555;cursor:pointer;">💸 引き出し</button>
+        <button onclick="atmSetMode('send')" id="atm-tab-send" style="flex:1;padding:8px;border:2px solid #e0e0e0;border-radius:10px;background:#fff;font-weight:bold;color:#555;cursor:pointer;">📤 送金</button>
+      </div>
+      <div id="atm-deposit-panel">
+        <label style="font-size:13px;font-weight:bold;color:#555;">預け入れ金額（円）</label>
+        <input id="atm-deposit-amount" type="number" min="1" value="100" style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;" />
+        <button onclick="atmDeposit()" style="width:100%;margin-top:10px;padding:11px;background:#43a047;color:white;border:none;border-radius:12px;font-size:15px;font-weight:bold;cursor:pointer;">預け入れ</button>
+      </div>
+      <div id="atm-withdraw-panel" style="display:none;">
+        <label style="font-size:13px;font-weight:bold;color:#555;">引き出し金額（円）</label>
+        <input id="atm-withdraw-amount" type="number" min="1" value="100" style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;" />
+        <button onclick="atmWithdraw()" style="width:100%;margin-top:10px;padding:11px;background:#1565c0;color:white;border:none;border-radius:12px;font-size:15px;font-weight:bold;cursor:pointer;">引き出し</button>
+      </div>
+      <div id="atm-send-panel" style="display:none;">
+        <label style="font-size:13px;font-weight:bold;color:#555;">送金額（円）</label>
+        <input id="atm-send-amount" type="number" min="1" value="100" style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:2px solid #e0e0e0;font-size:14px;" />
+        <button onclick="atmSend()" style="width:100%;margin-top:10px;padding:11px;background:#ef6c00;color:white;border:none;border-radius:12px;font-size:15px;font-weight:bold;cursor:pointer;">👥 送金先を選ぶ</button>
+      </div>
+      <div id="atm-msg" style="min-height:1.4em;font-size:13px;color:#e53935;margin-top:8px;text-align:center;"></div>
+    </div>
+  </div>
+
+  <!-- 🎁 ペットギフト受信ポップアップ -->
+  <div id="gift-popup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border-radius:20px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,0.25);z-index:9999;min-width:300px;text-align:center;">
+    <div style="font-size:28px;margin-bottom:8px;">🎁</div>
+    <div style="font-size:16px;font-weight:bold;margin-bottom:4px;" id="gift-popup-title">ペットギフトが届きました！</div>
+    <div style="font-size:13px;color:#888;margin-bottom:14px;" id="gift-popup-desc"></div>
+    <div id="gift-popup-pet" style="margin-bottom:16px;"></div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="acceptGift()" style="flex:1;padding:10px;background:#ffb74d;color:white;border:none;border-radius:12px;font-weight:bold;cursor:pointer;">✅ 受け取る</button>
+      <button onclick="rejectGift()" style="flex:1;padding:10px;background:#e0e0e0;color:#555;border:none;border-radius:12px;font-weight:bold;cursor:pointer;">❌ 断る</button>
+    </div>
+  </div>
+
 </body>
 </html>
