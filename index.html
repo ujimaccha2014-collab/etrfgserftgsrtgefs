@@ -1265,9 +1265,9 @@
             2️⃣ ユーザー一覧から送る相手を選ぶ<br>
             3️⃣ 相手にリアルタイムでポップアップが届く<br>
             ✅ 相手が「受け取る」→ 相手のペットに追加・自分から消える<br>
-            ❌ 相手が「断る」→ 何も起きない（自分のペットは戻らない）
+            ❌ 相手が「断る」→ ペットは自分のもとに戻ってくる
           </div>
-          <p style="margin:6px 0 0;font-size:12px;color:#e53935;">⚠️ ギフトを送ると自分のリストからペットが消えます。慎重に！</p>
+          <p style="margin:6px 0 0;font-size:12px;color:#e53935;">⚠️ ギフトを送ると一時的に自分のリストから消えます。相手が断ると戻ってきます。</p>
         </div>
 
         <!-- ランキング -->
@@ -1647,6 +1647,15 @@
       }
     };
 
+    // ギフト拒否時にペットを送り主へ返却
+    window._fbReturnPetGift = async function(toUid, rejectorName, pet) {
+      if (!firebaseOK || !db) return;
+      try {
+        const { push: fbPush } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js');
+        await fbPush(ref(db, `inbox/${toUid}/returned_pets`), { pet, rejectorName, ts: Date.now() });
+      } catch(e) { console.warn('Firebase returnPetGift failed:', e); }
+    };
+
     window._fbListenPetGifts = function(uid, callback) {
       if (!firebaseOK || !db) return;
       import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({ onChildAdded }) => {
@@ -1655,6 +1664,19 @@
           const d = snap.val();
           if (!d) return;
           callback({ giftId: snap.key, fromUid: d.fromUid, fromName: d.fromName, pet: d.pet });
+        });
+      });
+    };
+
+    window._fbListenReturnedPets = function(uid, callback) {
+      if (!firebaseOK || !db) return;
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js').then(({ onChildAdded, remove }) => {
+        const retRef = ref(db, `inbox/${uid}/returned_pets`);
+        onChildAdded(retRef, async (snap) => {
+          const d = snap.val();
+          if (!d) return;
+          callback(d);
+          await remove(snap.ref);
         });
       });
     };
@@ -3561,7 +3583,13 @@
     function atmWithdraw() {
       const amt = Math.floor(Number(document.getElementById('atm-withdraw-amount').value) || 0);
       if (amt <= 0) { document.getElementById('atm-msg').innerText = '金額を入力してください'; return; }
-      document.getElementById('atm-msg').innerText = '✅ 引き出し完了！（ゲーム内残高はそのままです）';
+      if (amt > playerBalance) { document.getElementById('atm-msg').innerText = '残高が足りません'; return; }
+      playerBalance -= amt;
+      saveData();
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+      document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('atm-msg').style.color = '#2e7d32';
+      document.getElementById('atm-msg').innerText = `✅ ${formatMoney(amt)}円 を引き出しました！`;
     }
     async function atmSend() {
       const amt = Math.floor(Number(document.getElementById('atm-send-amount').value) || 0);
@@ -3613,7 +3641,11 @@
       if (typeof window._fbRespondPetGift === 'function') {
         window._fbRespondPetGift(pendingGift.giftId, 'reject', userId, profile.name);
       }
-      showToast('ギフトを断りました');
+      // 送り主のペットを返還（Firebase経由で送り主のinboxに返却通知）
+      if (typeof window._fbReturnPetGift === 'function') {
+        window._fbReturnPetGift(pendingGift.fromUid, profile.name, pendingGift.pet);
+      }
+      showToast('ギフトを断りました。ペットは相手に返却されます。');
       document.getElementById('gift-popup').style.display = 'none';
       pendingGift = null;
     }
@@ -3640,6 +3672,14 @@
       if (typeof window._fbListenPetGifts === 'function') {
         window._fbListenPetGifts(userId, (giftData) => {
           showGiftPopup(giftData);
+        });
+      }
+      // 拒否されて返ってきたペットを受信
+      if (typeof window._fbListenReturnedPets === 'function') {
+        window._fbListenReturnedPets(userId, (data) => {
+          pets.push(data.pet);
+          saveData();
+          showToast(`💔 ${data.rejectorName} さんがギフトを断りました。${data.pet.name} が戻ってきました！`);
         });
       }
     }
