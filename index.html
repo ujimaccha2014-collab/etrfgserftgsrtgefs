@@ -1822,6 +1822,7 @@
     const LS_PETS     = 'roborace_pets';
 
     let playerBalance = 1000;
+    let bankBalance = 0; // 口座残高
     let profile = { name: 'プレイヤー', spirit: 'よろしく！' };
     let stats = { totalBets: 0, wins: 0, peakBalance: 1000, totalEarned: 0 };
     let betHistory = [];
@@ -1873,6 +1874,7 @@
     function loadData() {
       migrateLocalStorage();
       playerBalance = loadBigNum(LS_BALANCE, 1000);
+      bankBalance = loadBigNum('roborace_bank', 0);
       const defaultName = 'プレイヤー' + (Math.floor(Math.random() * 900) + 100);
       profile = JSON.parse(localStorage.getItem(LS_PROFILE) || `{"name":"${defaultName}","spirit":"よろしく！"}`);
       stats = loadStatsObj({totalBets:0, wins:0, peakBalance:1000, totalEarned:0});
@@ -1887,6 +1889,7 @@
 
     function saveData() {
       saveBigNum(LS_BALANCE, playerBalance);
+      saveBigNum('roborace_bank', bankBalance);
       localStorage.setItem(LS_PROFILE, JSON.stringify(profile));
       saveStatsObj(stats);
       localStorage.setItem(LS_HISTORY, JSON.stringify(betHistory.slice(-30)));
@@ -3561,6 +3564,7 @@
     let atmMode = 'deposit';
     function openATM() {
       document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('atm-bank-disp').innerText = formatMoney(bankBalance) + ' 円';
       const msg = document.getElementById('atm-msg');
       msg.innerText = '';
       msg.style.color = '#e53935';
@@ -3581,22 +3585,27 @@
       const amt = Math.floor(Number(document.getElementById('atm-deposit-amount').value) || 0);
       const msg = document.getElementById('atm-msg');
       if (amt <= 0) { msg.style.color = '#e53935'; msg.innerText = '金額を入力してください'; return; }
-      playerBalance += amt;
+      if (amt > playerBalance) { msg.style.color = '#e53935'; msg.innerText = '所持金が足りません'; return; }
+      playerBalance -= amt;
+      bankBalance += amt;
       saveData();
       document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('atm-bank-disp').innerText = formatMoney(bankBalance) + ' 円';
       msg.style.color = '#2e7d32';
-      msg.innerText = `✅ ${formatMoney(amt)}円 を預け入れました！`;
+      msg.innerText = `✅ ${formatMoney(amt)}円 を口座に預けました！`;
     }
     function atmWithdraw() {
       const amt = Math.floor(Number(document.getElementById('atm-withdraw-amount').value) || 0);
       const msg = document.getElementById('atm-msg');
       if (amt <= 0) { msg.style.color = '#e53935'; msg.innerText = '金額を入力してください'; return; }
-      if (amt > playerBalance) { msg.style.color = '#e53935'; msg.innerText = '残高が足りません'; return; }
-      playerBalance -= amt;
+      if (amt > bankBalance) { msg.style.color = '#e53935'; msg.innerText = '口座残高が足りません'; return; }
+      bankBalance -= amt;
+      playerBalance += amt;
       saveData();
       document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
+      document.getElementById('atm-bank-disp').innerText = formatMoney(bankBalance) + ' 円';
       msg.style.color = '#2e7d32';
       msg.innerText = `✅ ${formatMoney(amt)}円 を引き出しました！`;
     }
@@ -3720,9 +3729,13 @@
     <div class="modal-box" style="max-width:400px;">
       <div class="modal-title"><span>🏧 ATM</span><button class="modal-close" onclick="closeModal('atm-modal')">×</button></div>
       <div style="background:#f9f9f9;border-radius:12px;padding:12px;margin-bottom:14px;font-size:14px;">
-        <div style="display:flex;justify-content:space-between;">
-          <span style="color:#888;">💰 現在の所持金</span>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="color:#888;">💰 所持金</span>
           <span id="atm-balance-disp" style="font-weight:bold;color:#2e7d32;">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:#888;">🏦 口座残高</span>
+          <span id="atm-bank-disp" style="font-weight:bold;color:#1565c0;">-</span>
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:10px;">
