@@ -3561,7 +3561,9 @@
     let atmMode = 'deposit';
     function openATM() {
       document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
-      document.getElementById('atm-msg').innerText = '';
+      const msg = document.getElementById('atm-msg');
+      msg.innerText = '';
+      msg.style.color = '#e53935';
       atmSetMode('deposit');
       document.getElementById('atm-modal').classList.add('open');
     }
@@ -3576,20 +3578,27 @@
       });
     }
     function atmDeposit() {
-      // 預け入れ = ゲーム内残高はそのまま（表示上の「口座」機能は今後拡張用）
-      // 今回はゲーム内残高自体が「口座」なので、入金は何もしない（UIのみ）
-      document.getElementById('atm-msg').innerText = '✅ 預け入れ完了！（ゲーム内残高はそのままです）';
+      const amt = Math.floor(Number(document.getElementById('atm-deposit-amount').value) || 0);
+      const msg = document.getElementById('atm-msg');
+      if (amt <= 0) { msg.style.color = '#e53935'; msg.innerText = '金額を入力してください'; return; }
+      playerBalance += amt;
+      saveData();
+      document.getElementById('player-balance').innerText = formatMoney(playerBalance);
+      document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
+      msg.style.color = '#2e7d32';
+      msg.innerText = `✅ ${formatMoney(amt)}円 を預け入れました！`;
     }
     function atmWithdraw() {
       const amt = Math.floor(Number(document.getElementById('atm-withdraw-amount').value) || 0);
-      if (amt <= 0) { document.getElementById('atm-msg').innerText = '金額を入力してください'; return; }
-      if (amt > playerBalance) { document.getElementById('atm-msg').innerText = '残高が足りません'; return; }
+      const msg = document.getElementById('atm-msg');
+      if (amt <= 0) { msg.style.color = '#e53935'; msg.innerText = '金額を入力してください'; return; }
+      if (amt > playerBalance) { msg.style.color = '#e53935'; msg.innerText = '残高が足りません'; return; }
       playerBalance -= amt;
       saveData();
       document.getElementById('player-balance').innerText = formatMoney(playerBalance);
       document.getElementById('atm-balance-disp').innerText = formatMoney(playerBalance) + ' 円';
-      document.getElementById('atm-msg').style.color = '#2e7d32';
-      document.getElementById('atm-msg').innerText = `✅ ${formatMoney(amt)}円 を引き出しました！`;
+      msg.style.color = '#2e7d32';
+      msg.innerText = `✅ ${formatMoney(amt)}円 を引き出しました！`;
     }
     async function atmSend() {
       const amt = Math.floor(Number(document.getElementById('atm-send-amount').value) || 0);
